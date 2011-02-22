@@ -1,0 +1,19 @@
+.invalid {
+	background:#fff url(/bbve_ve_web_pub/images/invalid_line.gif) repeat-x bottom;
+	border: 2px solid #dd7870;
+}
+
+.validator {
+	background:#ffffff;
+	width: 16px;
+	height: 16px;
+	top: 12px;
+}
+
+select.invalid {
+	font-size: 12px;
+	font-family:Courier New,Verdana,Helvetica;
+	color:#31616C; 
+	background:#fff url(/bbve_ve_web_pub/images/invalid_line.gif) repeat-x bottom;
+	border: 2px solid #dd7870;
+}
