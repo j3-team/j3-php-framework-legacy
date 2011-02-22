@@ -1,0 +1,27 @@
+.newLovCombo {
+	border: 1px solid;
+	background-color: white;
+	overflow: auto;
+	position: absolute;
+	height: 200px;
+	font-size: 12px;
+	font-family:Courier New,Verdana,Helvetica;
+	color:#31616C; 
+}
+
+.labelCount {
+	display: block;
+	background-color: #CCCCCC;
+	text-align: right;
+	font-weight: bold;
+}
+
+.labelPar {
+	display: block;
+	background-color: white;
+}
+
+.labelImpar {
+	display: block;
+	background-color: #EEEEEE;
+}

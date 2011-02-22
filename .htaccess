@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+
+#    RewriteCond %{REQUEST_FILENAME} !-d
+#    RewriteCond %{REQUEST_FILENAME} !-f
+
+	RewriteRule ^(.*)/recursos/(.*)$ recursos/$2 [QSA,L]
+	RewriteRule ^(.*)/(.*)/(.*)/(.*)$ index.php?controlador=$1&metodo=$2&tres=$3&$4 [QSA,L]
+	RewriteRule ^(.*)/(.*)/(.*)$ index.php?controlador=$1&metodo=$2&tres=$3 [QSA,L]
+	RewriteRule ^(.*)/(.*)$ index.php?controlador=$1&metodo=$2 [QSA,L]
+	RewriteRule ^(.*)$ index.php?controlador=$1 [QSA,L]    
+#	RewriteRule ^(.*)$ index.php?controlador=$1&metodo=index [QSA,L]    
+</IfModule>
