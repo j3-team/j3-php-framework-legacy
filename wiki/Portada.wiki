@@ -1,0 +1,9 @@
+#labels Featured,Phase-Requirements,Portada
+= Introducción =
+
+j3-php-framework es un framework creado con la intención de facilitar el trabajo de crear aplicaciones webs escritas en PHP. Es un proyecto pequeño, que esperamos que vaya creciendo poco a poco.
+
+
+= Detalles =
+
+Siendo un proyecto con poco tiempo de creado, la documentación se está generando. Esperamos sean pacientes, poco a poco la documentación crecerá y será más descriptiva, ayudando en el proceso de entrenamiento e instrucción acerca de j3-php-framework.
