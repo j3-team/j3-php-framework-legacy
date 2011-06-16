@@ -1,13 +1,20 @@
 <?php
-	require_once("dbconnection.php");
+require_once("dbconnection.php");
 
-	define("EQUAL", 1);
-	define("LESS", 2);
-	define("MORE", 3);
-	define("LESS_EQUAL", 4);
-	define("MORE_EQUAL", 5);
-	define("ASC", 6);
-	define("DESC", 7);
+define("DB_EQUAL",      1);
+define("DB_LESS",       2);
+define("DB_MORE",       3);
+define("DB_LESS_EQUAL", 4);
+define("DB_MORE_EQUAL", 5);
+define("DB_NULL",       6);
+define("DB_NOT_NULL",   7);
+define("DB_LIKE",       8);
+define("DB_ILIKE",      9);
+define("DB_IN",        10);
+define("DB_NOT_IN",    11);
+define("DB_ASC",       12);
+define("DB_DESC",      13);
+
 
 /** Clase para los modelos
 	 @author Jhon Freitez
@@ -25,6 +32,10 @@ class DbModel {
 	private $conditionFields;	
 	private $orderField;	
 	
+	
+	/** Constructor.
+	 * @param id. ID del registro (Si existe en la BD)
+	 */
 	public function __construct($id = null) {
 		try {
 			$this->conn = new DbConnection();
@@ -42,6 +53,8 @@ class DbModel {
 	}
 	
 	
+	/** Retorna el ID de la consulta ejecutada anteriormente.
+	 */
 	public function getId() {
 		return $this->id;
 	}
@@ -210,7 +223,7 @@ class DbModel {
        @param compType Tipo de comparación (IGUAL, MENOR, MAYOR, MENOR_IGUAL, MAYOR_IGUAL).
        @return bool
 	*/
-	public function doSelectAllWithCondition($field, $value, $compType = EQUAL) {
+	public function doSelectAllWithCondition($field, $value, $compType = DB_EQUAL) {
 		if ($this->tableName == null) {
 			throw new Exception ("Tabla no especificada");
 			return false;
@@ -218,20 +231,32 @@ class DbModel {
 
 		$comp;
 		switch ($compType) {
-			case EQUAL:
+			case DB_EQUAL:
 				$comp = "=";
 				break;
-			case LESS:
+			case DB_LESS:
 				$comp = "<";
 				break;
-			case MORE:
+			case DB_MORE:
 				$comp = ">";
 				break;
-			case LESS_EQUAL:
+			case DB_LESS_EQUAL:
 				$comp = "<=";
 				break;
-			case MORE_EQUAL:
+			case DB_MORE_EQUAL:
 				$comp = ">=";
+				break;
+			case DB_LIKE:
+				$comp = "LIKE";
+				break;
+			case DB_ILIKE:
+				$comp = "ILIKE";
+				break;
+			case DB_IN:
+				$comp = "IN";
+				break;
+			case DB_NOT_IN:
+				$comp = "NOT IN";
 				break;
 		}
 
@@ -352,7 +377,7 @@ class DbModel {
         @param compType Tipo de comparación (Igual, Menor, Mayor, Menor o igual, Mayor o igual).
         @return bool
     */
-    public function doDeleteAll($field, $value, $compType = EQUAL) {
+    public function doDeleteAll($field, $value, $compType = DB_EQUAL) {
 		if ($this->tableName == null) {
 			throw new Exception ("Tabla no especificada");
 			return false;
@@ -360,20 +385,32 @@ class DbModel {
 
 		$comp;
 		switch ($compType) {
-			case EQUAL:
+			case DB_EQUAL:
 				$comp = "=";
 				break;
-			case LESS:
+			case DB_LESS:
 				$comp = "<";
 				break;
-			case MORE:
+			case DB_MORE:
 				$comp = ">";
 				break;
-			case LESS_EQUAL:
+			case DB_LESS_EQUAL:
 				$comp = "<=";
 				break;
-			case MORE_EQUAL:
+			case DB_MORE_EQUAL:
 				$comp = ">=";
+				break;
+			case DB_LIKE:
+				$comp = "LIKE";
+				break;
+			case DB_ILIKE:
+				$comp = "ILIKE";
+				break;
+			case DB_IN:
+				$comp = "IN";
+				break;
+			case DB_NOT_IN:
+				$comp = "NOT IN";
 				break;
 		}
 		
@@ -421,23 +458,35 @@ class DbModel {
         @param compType Tipo de comparación (Igual, Menor, Mayor, Menor o igual, Mayor o igual).
         @return bool
     */
-    public function addCondition($field, $value, $compType = EQUAL) {
+    public function addCondition($field, $value, $compType = DB_EQUAL) {
 		$comp;
 		switch ($compType) {
-			case EQUAL:
+			case DB_EQUAL:
 				$comp = "=";
 				break;
-			case LESS:
+			case DB_LESS:
 				$comp = "<";
 				break;
-			case MORE:
+			case DB_MORE:
 				$comp = ">";
 				break;
-			case LESS_EQUAL:
+			case DB_LESS_EQUAL:
 				$comp = "<=";
 				break;
-			case MORE_EQUAL:
+			case DB_MORE_EQUAL:
 				$comp = ">=";
+				break;
+			case DB_LIKE:
+				$comp = "LIKE";
+				break;
+			case DB_ILIKE:
+				$comp = "ILIKE";
+				break;
+			case DB_IN:
+				$comp = "IN";
+				break;
+			case DB_NOT_IN:
+				$comp = "NOT IN";
 				break;
 		}
 		$this->conditionFields[$field] = $value;
@@ -449,13 +498,13 @@ class DbModel {
         @param field Campo a traves del cual se ordenara.
         @param type Tipo de ordenacion (ASC, DESC).
     */
-    public function addOrderBy($field, $type = ASC) {
+    public function addOrderBy($field, $type = DB_ASC) {
 		$typeS;
 		switch ($type) {
-			case ASC:
+			case DB_ASC:
 				$typeS = "ASC";
 				break;
-			case DESC:
+			case DB_DESC:
 				$typeS = "DESC";
 				break;
 		}
@@ -502,9 +551,9 @@ class DbModel {
         @return bool
     */
     public function next() {
-		$this->fieldsByName = pg_fetch_assoc($this->result);
-		pg_result_seek($this->result, $this->cursor);
-		$this->fieldsByPos = pg_fetch_array($this->result);
+		$this->fieldsByName = $this->conn->getFetchAssoc($this->result);
+		$this->seek($this->result, $this->cursor);
+		$this->fieldsByPos = $this->conn->getFetchArray($this->result);
 		$this->cursor = $this->cursor + 1;
 		if (isset($this->fieldsByName["id"]))
 			$this->id = $this->fieldsByName["id"];
@@ -516,11 +565,12 @@ class DbModel {
 		return $this->result;
 	}
 
+	
 	/** Mueve el apuntador a la posicion dada.
 		@param pos Posición del cursor (comienzo = 0).
 	*/
 	public function seek($pos) {
-		pg_result_seek($this->result, $pos);
+		$this->conn->seek($this->result, $pos);
 		$this->cursor = $pos;
 	}
 	
@@ -529,13 +579,13 @@ class DbModel {
 		@return int
 	*/
 	public function rows() {
-		return pg_num_rows ( $this->result );
+		return $this->conn->getNumRows( $this->result );
 	}
 	
 	/** Mueve el apuntador al comienzo.
 	*/
 	public function first() {
-		pg_result_seek($this->result, 0);
+		$this->conn->seek($this->result, 0);
 		$this->cursor = 0;
 	}
 	
@@ -544,10 +594,10 @@ class DbModel {
         @return Array
     */
     public function fieldNames() {
-		$count = pg_num_fields($this->result);
+		$count = $this->conn->getNumFields($this->result);
 		$array = array();
 		for ($i=0; $i<$count; $i=$i+1) {
-			$array[$i] = pg_field_name($this->result, $i);
+			$array[$i] = $this->conn->getFieldName($this->result, $i);
 		}
 		return $array;
 	}

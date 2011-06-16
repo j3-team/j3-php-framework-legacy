@@ -17,6 +17,7 @@ class DbConnection {
 	private $myFirePhp;
 	private $logger;
 	
+	
 	/** Constructor parametrizable
 		 @param driver Nombre del driver a utilizar
 		 @param host Servidor de la base de datos
@@ -53,6 +54,7 @@ class DbConnection {
 		return $this->connection;
 	}
 	
+	
  	/** Obtiene el último error arrojado por la Base de Datos
  		 @param String
  	*/
@@ -83,6 +85,7 @@ class DbConnection {
  		}
 	}
  	
+	
  	/** Intenta conectarse a la Base de datos
  	*/
  	public function conectar()	{
@@ -368,6 +371,7 @@ class DbConnection {
  		return false;
 	}
 	
+	
 	/** genera una cadena aleatoria.
 	*/
 	function randomString($length=10,$uc=TRUE,$n=TRUE,$sc=FALSE) {
@@ -433,6 +437,7 @@ class DbConnection {
 		
 		return null;
 	}
+
 	
 	/** Toma el valor de un dato tipo BLOB y lo guarda en un archivo.
 		@param path Ruta del archivo.
@@ -467,6 +472,199 @@ class DbConnection {
  		}
 		
 		return file_put_contents($path, $content);
+	}
+	
+
+	/** Retorna el fetch_assoc del resultado del query
+	 *  @param result. Resultado del query. (Recordset)
+	 *  @return Array.
+	 */
+	public function getFetchAssoc($result) {
+		if ($this->driver == "PGSQL") {
+ 			
+ 			return pg_fetch_assoc($result);
+ 			
+ 		} elseif ($this->driver == "MYSQL") {
+ 			
+ 			return mysql_fetch_assoc($result);
+ 			
+ 		} elseif ($this->driver == "DB2") {
+ 			
+			return db2_fetch_assoc($result);
+ 			
+ 		} elseif ($this->driver == "SQLITE") {
+ 			
+			//return sqlite_f		
+ 			
+ 		} elseif ($this->driver == "ODBC") {
+ 			
+ 			//return odbc_fe
+ 			
+ 		} elseif ($this->driver == "ORACLE") {
+ 			
+ 			//return 
+ 		}
+	}
+	
+	
+	/** Retorna el fetch_array del resultado del query
+	 *  @param result. Resultado del query. (Recordset)
+	 *  @return Array.
+	 */
+	public function getFetchArray($result) {
+		if ($this->driver == "PGSQL") {
+ 			
+ 			return pg_fetch_array($result);
+ 			
+ 		} elseif ($this->driver == "MYSQL") {
+ 			
+ 			return mysql_fetch_array($result);
+ 			
+ 		} elseif ($this->driver == "DB2") {
+ 			
+			return db2_fetch_array($result);
+ 			
+ 		} elseif ($this->driver == "SQLITE") {
+ 			
+			return sqlite_fetch_array($result);		
+ 			
+ 		} elseif ($this->driver == "ODBC") {
+ 			
+ 			return odbc_fetch_array($result);
+ 			
+ 		} elseif ($this->driver == "ORACLE") {
+ 			
+ 			//return ora_error();
+ 		}
+	}
+	
+	
+	/** Mueve el cursor a la posicion dada dentro del result.
+	 * @param result. Resultado del query.
+	 * @param pos. Posicion.
+	 */ 
+	public function seek($result, $pos) {
+		if ($this->driver == "PGSQL") {
+ 			
+ 			pg_result_seek($result, $pos);
+ 			
+ 		} elseif ($this->driver == "MYSQL") {
+ 			
+ 			//mysql_
+ 			
+ 		} elseif ($this->driver == "DB2") {
+ 			
+			//db2_mo
+ 			
+ 		} elseif ($this->driver == "SQLITE") {
+ 			
+			sqlite_seek($pos);		
+ 			
+ 		} elseif ($this->driver == "ODBC") {
+ 			
+ 			//odbc_m
+ 			
+ 		} elseif ($this->driver == "ORACLE") {
+ 			
+ 			//ora
+ 		}
+	}
+	
+	
+	/** Retorna el numero de filas en el result.
+	 * @param result. Resultado del query.
+	 * @return int.
+	 */ 
+	public function getNumRows($result) {
+		if ($this->driver == "PGSQL") {
+ 			
+ 			pg_num_rows($result);
+ 			
+ 		} elseif ($this->driver == "MYSQL") {
+ 			
+ 			mysql_num_rows($result);
+ 			
+ 		} elseif ($this->driver == "DB2") {
+ 			
+			db2_num_rows($result);
+ 			
+ 		} elseif ($this->driver == "SQLITE") {
+ 			
+			sqlite_num_rows();
+ 			
+ 		} elseif ($this->driver == "ODBC") {
+ 			
+ 			odbc_num_rows($result);
+ 			
+ 		} elseif ($this->driver == "ORACLE") {
+ 			
+ 			//ora
+ 		}
+	}
+	
+	
+	/** Retorna el numero de campos en el result.
+	 * @param result. Resultado del query.
+	 * @return int.
+	 */ 
+	public function getNumFields($result) {
+		if ($this->driver == "PGSQL") {
+ 			
+ 			pg_num_fields($result);
+ 			
+ 		} elseif ($this->driver == "MYSQL") {
+ 			
+ 			mysql_num_fields($result);
+ 			
+ 		} elseif ($this->driver == "DB2") {
+ 			
+			db2_num_fields($result);
+ 			
+ 		} elseif ($this->driver == "SQLITE") {
+ 			
+			sqlite_num_fields();
+ 			
+ 		} elseif ($this->driver == "ODBC") {
+ 			
+ 			odbc_num_fields($result);
+ 			
+ 		} elseif ($this->driver == "ORACLE") {
+ 			
+ 			//ora
+ 		}
+	}
+	
+	
+	/** Retorna el nombre del campo dado en el result.
+	 * @param result. Resultado del query.
+	 * @param num. Numero del campo.
+	 * @return String.
+	 */ 
+	public function getFieldName($result, $num) {
+		if ($this->driver == "PGSQL") {
+ 			
+ 			pg_field_name($result, $num);
+ 			
+ 		} elseif ($this->driver == "MYSQL") {
+ 			
+ 			mysql_field_name($result, $num);
+ 			
+ 		} elseif ($this->driver == "DB2") {
+ 			
+			db2_field_name($result, $num);
+ 			
+ 		} elseif ($this->driver == "SQLITE") {
+ 			
+			sqlite_field_name($num);
+ 			
+ 		} elseif ($this->driver == "ODBC") {
+ 			
+ 			odbc_field_name($result, $num);
+ 			
+ 		} elseif ($this->driver == "ORACLE") {
+ 			
+ 			//ora
+ 		}
 	}
 }
 ?>
