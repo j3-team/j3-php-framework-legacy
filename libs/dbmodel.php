@@ -552,7 +552,7 @@ class DbModel {
     */
     public function next() {
 		$this->fieldsByName = $this->conn->getFetchAssoc($this->result);
-		$this->seek($this->result, $this->cursor);
+		$this->seek($this->cursor);
 		$this->fieldsByPos = $this->conn->getFetchArray($this->result);
 		$this->cursor = $this->cursor + 1;
 		if (isset($this->fieldsByName["id"]))
