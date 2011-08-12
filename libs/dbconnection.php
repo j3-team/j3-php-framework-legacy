@@ -578,27 +578,27 @@ class DbConnection {
 	public function getNumRows($result) {
 		if ($this->driver == "PGSQL") {
  			
- 			pg_num_rows($result);
+ 			return pg_num_rows($result);
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			mysql_num_rows($result);
+ 			return mysql_num_rows($result);
  			
  		} elseif ($this->driver == "DB2") {
  			
-			db2_num_rows($result);
+			return db2_num_rows($result);
  			
  		} elseif ($this->driver == "SQLITE") {
  			
-			sqlite_num_rows();
+			return sqlite_num_rows();
  			
  		} elseif ($this->driver == "ODBC") {
  			
- 			odbc_num_rows($result);
+ 			return odbc_num_rows($result);
  			
  		} elseif ($this->driver == "ORACLE") {
  			
- 			//ora
+ 			//return ora
  		}
 	}
 	
@@ -610,27 +610,27 @@ class DbConnection {
 	public function getNumFields($result) {
 		if ($this->driver == "PGSQL") {
  			
- 			pg_num_fields($result);
+ 			return pg_num_fields($result);
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			mysql_num_fields($result);
+ 			return mysql_num_fields($result);
  			
  		} elseif ($this->driver == "DB2") {
  			
-			db2_num_fields($result);
+			return db2_num_fields($result);
  			
  		} elseif ($this->driver == "SQLITE") {
  			
-			sqlite_num_fields();
+			return sqlite_num_fields();
  			
  		} elseif ($this->driver == "ODBC") {
  			
- 			odbc_num_fields($result);
+ 			return odbc_num_fields($result);
  			
  		} elseif ($this->driver == "ORACLE") {
  			
- 			//ora
+ 			//return ora
  		}
 	}
 	
@@ -643,27 +643,27 @@ class DbConnection {
 	public function getFieldName($result, $num) {
 		if ($this->driver == "PGSQL") {
  			
- 			pg_field_name($result, $num);
+ 			return pg_field_name($result, $num);
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			mysql_field_name($result, $num);
+ 			return mysql_field_name($result, $num);
  			
  		} elseif ($this->driver == "DB2") {
  			
-			db2_field_name($result, $num);
+			return db2_field_name($result, $num);
  			
  		} elseif ($this->driver == "SQLITE") {
  			
-			sqlite_field_name($num);
+			return sqlite_field_name($num);
  			
  		} elseif ($this->driver == "ODBC") {
  			
- 			odbc_field_name($result, $num);
+ 			return odbc_field_name($result, $num);
  			
  		} elseif ($this->driver == "ORACLE") {
  			
- 			//ora
+ 			//return ora
  		}
 	}
 }
