@@ -401,16 +401,16 @@ class DbModel {
 				$comp = ">=";
 				break;
 			case DB_LIKE:
-				$comp = "LIKE";
+				$comp = " LIKE ";
 				break;
 			case DB_ILIKE:
-				$comp = "ILIKE";
+				$comp = " ILIKE ";
 				break;
 			case DB_IN:
-				$comp = "IN";
+				$comp = " IN ";
 				break;
 			case DB_NOT_IN:
-				$comp = "NOT IN";
+				$comp = " NOT IN ";
 				break;
 		}
 		
@@ -477,16 +477,16 @@ class DbModel {
 				$comp = ">=";
 				break;
 			case DB_LIKE:
-				$comp = "LIKE";
+				$comp = " LIKE ";
 				break;
 			case DB_ILIKE:
-				$comp = "ILIKE";
+				$comp = " ILIKE ";
 				break;
 			case DB_IN:
-				$comp = "IN";
+				$comp = " IN ";
 				break;
 			case DB_NOT_IN:
-				$comp = "NOT IN";
+				$comp = " NOT IN ";
 				break;
 		}
 		$this->conditionFields[$field] = $value;
