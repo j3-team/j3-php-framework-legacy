@@ -31,7 +31,7 @@ class DbModel {
 	private $conditionOperators;
 	private $conditionFields;	
 	private $orderField;	
-	
+	private $endIN;
 	
 	/** Constructor.
 	 * @param id. ID del registro (Si existe en la BD)
@@ -74,32 +74,51 @@ class DbModel {
 		$this->conditionOperators = array();
 		$this->conditionFields = array();
 		$this->orderFields = array();
+		
+		$this->endIN = false;
 	}
 	
 	
-	/** Realiza un SELECT en la BD. Retorna todos los que coincidan.
-       @return bool.
-	*/
-	public function doSelectAll() {
-		if ($this->tableName == null) {
-			throw new Exception ("Tabla no especificada");
-			return false;
+	private function getOperator($i, $k, $o) {
+		if (strcmp($o, "##") != 0) {
+			$cond = $k . $o;
+			if ($i > 0) {
+				if ($this->endIN == true) {
+					$this->endIN = false;
+					return ") AND " . $cond;
+				} else {
+					return " AND " . $cond;
+				}
+			} else {
+				return $cond;
+			}
+		} else {
+			$this->endIN = true;
+			return ", ";
 		}
+	}
 	
+	/** Genera la tira SQL con las condiciones
+	*/
+	private function getConditions() {
 		$condiciones = null;
-		$ok;
 
 		$i = 0;
 		if (is_array($this->conditionFields))
 			foreach ($this->conditionFields as $key => $value) {
-				if ($i > 0) {
-					$condiciones = $condiciones . " AND " . $key . $this->conditionOperators[$i] . "$" . ($i+1);
-				} else {
-					$condiciones = $key . $this->conditionOperators[$i] . "$" . ($i+1);
-				}
+				$condiciones = $condiciones . getOperator($i, $key, $this->conditionOperators[$i]) . "$" . ($i+1);
 				$i = $i+1;
 			}
-
+			
+		if ($this->endIN == true) {
+			$this->endIN = false;
+			$condiciones = $condiciones . ")";
+		}
+			
+		return $condiciones;
+	}
+	
+	private function getOrders() {
 		$orders = null;
 		$i = 0;
 		if (is_array($this->orderFields))
@@ -111,6 +130,22 @@ class DbModel {
 				}
 				$i = $i+1;
 			}
+		
+		return $orders;
+	}
+	
+	/** Realiza un SELECT en la BD. Retorna todos los que coincidan.
+       @return bool.
+	*/
+	public function doSelectAll() {
+		if ($this->tableName == null) {
+			throw new Exception ("Tabla no especificada");
+			return false;
+		}
+	
+		$condiciones = getConditions();
+		
+		$orders = getOrders();
 		
 		if ($condiciones == null) {
 			try {
@@ -168,31 +203,9 @@ class DbModel {
 			return false;
 		}
 	
-		$condiciones = null;
-		$ok;
-
-		$i = 0;
-		if (is_array($this->conditionFields))
-			foreach ($this->conditionFields as $key => $value) {
-				if ($i > 0) {
-					$condiciones = $condiciones . " AND " . $key . $this->conditionOperators[$i] . "$" . ($i+1);
-				} else {
-					$condiciones = $key . $this->conditionOperators[$i] . "$" . ($i+1);
-				}
-				$i = $i+1;
-			}
-			
-		$orders = null;
-		$i = 0;
-		if (is_array($this->orderFields))
-			foreach ($this->orderFields as $key => $value) {
-				if ($i > 0) {
-					$orders = $orders . ", " . $key . " " . $value;
-				} else {
-					$orders = "ORDER BY " . $key . " ". $value;
-				}
-				$i = $i+1;
-			}
+		$condiciones = getConditions();
+		
+		$orders = getOrders();
 
 		if ($condiciones == null) {
 			try {
@@ -460,6 +473,7 @@ class DbModel {
     */
     public function addCondition($field, $value, $compType = DB_EQUAL) {
 		$comp;
+		$array = false;
 		switch ($compType) {
 			case DB_EQUAL:
 				$comp = "=";
@@ -483,14 +497,33 @@ class DbModel {
 				$comp = " ILIKE ";
 				break;
 			case DB_IN:
-				$comp = " IN ";
+				$comp = " IN (";
+				$array = true;
 				break;
 			case DB_NOT_IN:
-				$comp = " NOT IN ";
+				$comp = " NOT IN (";
+				$array = true;
 				break;
 		}
-		$this->conditionFields[$field] = $value;
-		array_push($this->conditionOperators, $comp);
+		
+		if ($array == true) {
+			$i = 0;
+			$arr = explode( ",", $value );
+			foreach ($arr as $val) {
+				if ($i > 0) {
+					$this->conditionFields[$field . $i] = $val;
+					array_push($this->conditionOperators, "##");
+				} else {
+					$this->conditionFields[$field] = $val;
+					array_push($this->conditionOperators, $comp);
+				}
+			}
+		} else {
+			$this->conditionFields[$field] = $value;
+			array_push($this->conditionOperators, $comp);
+		}
+		
+		
 	}
 	
 	
