@@ -106,7 +106,7 @@ class DbModel {
 		$i = 0;
 		if (is_array($this->conditionFields))
 			foreach ($this->conditionFields as $key => $value) {
-				$condiciones = $condiciones . getOperator($i, $key, $this->conditionOperators[$i]) . "$" . ($i+1);
+				$condiciones = $condiciones . $this->getOperator($i, $key, $this->conditionOperators[$i]) . "$" . ($i+1);
 				$i = $i+1;
 			}
 			
@@ -143,9 +143,9 @@ class DbModel {
 			return false;
 		}
 	
-		$condiciones = getConditions();
+		$condiciones = $this->getConditions();
 		
-		$orders = getOrders();
+		$orders = $this->getOrders();
 		
 		if ($condiciones == null) {
 			try {
@@ -203,9 +203,9 @@ class DbModel {
 			return false;
 		}
 	
-		$condiciones = getConditions();
+		$condiciones = $this->getConditions();
 		
-		$orders = getOrders();
+		$orders = $this->getOrders();
 
 		if ($condiciones == null) {
 			try {
