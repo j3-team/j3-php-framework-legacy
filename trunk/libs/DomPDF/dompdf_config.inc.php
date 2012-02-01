@@ -281,5 +281,8 @@ require_once(DOMPDF_INC_DIR . "/image_renderer.cls.php");
 require_once(DOMPDF_INC_DIR . "/renderer.cls.php");
 require_once(DOMPDF_INC_DIR . "/image_cache.cls.php");
 require_once(DOMPDF_INC_DIR . "/dompdf.cls.php");
+require_once(DOMPDF_INC_DIR . "/table_row_group_frame_decorator.cls.php");
+require_once(DOMPDF_INC_DIR . "/table_row_group_frame_reflower.cls.php");
+
 
 ?>
