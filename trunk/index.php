@@ -12,7 +12,7 @@ require_once 'conf/app.php';
  */
 function wellcome_page() {
 	if (!defined('APP_DEFAULT') || strcmp(trim(APP_DEFAULT), "") == 0) {
-		echo '<h1>..:: J3 PHP FRAMEWORK RULEZ ::... :D</h1>';
+		include 'libs/wellcome.php';
 	} else {
 		header("Location: " . APP_DEFAULT); 
 	}
