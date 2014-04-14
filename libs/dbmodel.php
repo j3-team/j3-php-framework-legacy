@@ -101,12 +101,13 @@ class DbModel {
 	/** Genera la tira SQL con las condiciones
 	*/
 	private function getConditions() {
+		
 		$condiciones = null;
 
 		$i = 0;
 		if (is_array($this->conditionFields))
 			foreach ($this->conditionFields as $key => $value) {
-				$condiciones = $condiciones . $this->getOperator($i, $key, $this->conditionOperators[$i]) . "$" . ($i+1);
+				$condiciones = $condiciones . $this->getOperator($i, $key, $this->conditionOperators[$i]) . $this->conn->getPreparedStatementVar($i+1);
 				$i = $i+1;
 			}
 			
@@ -155,9 +156,9 @@ class DbModel {
 				return false;
 			}
 		} else {
-			$this->result = $this->conn->preparar("SELECT * FROM $this->tableName WHERE $condiciones $orders");
 		
 			try {
+				$this->conn->preparar("SELECT * FROM $this->tableName WHERE $condiciones $orders");
 				$this->result = $this->conn->ejecutar(array_values($this->conditionFields));
 			} catch (Exception $e) {
 				throw $e;

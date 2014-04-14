@@ -65,7 +65,7 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			//return mysql_error() . "(" . mysql_errno(); . ")";
+ 			return $this->connection->error . "(" . $this->connection->errno . ")";
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -97,8 +97,7 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			//$this->connection = mysql_connect("$this->hostName:$this->port", $this->userName, $this->password);
- 			$notImplemented = true;
+ 			$this->connection = new mysqli($this->hostName, $this->userName, $this->password, $this->dbName, $this->port);
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -139,7 +138,7 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			$this->connection = mysql_close();
+ 			$this->connection->close();
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -171,6 +170,9 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
+ 			$this->connection->autocommit(FALSE);
+ 			$result = $this->connection->query("START TRANSACTION");
+ 			
  		} elseif ($this->driver == "DB2") {
  			
  		} elseif ($this->driver == "SQLITE") {
@@ -201,6 +203,8 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
+ 			$result = $this->connection->commit();
+ 			
  		} elseif ($this->driver == "DB2") {
  			
  		} elseif ($this->driver == "SQLITE") {
@@ -230,7 +234,7 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
-			$result =  mysql_query("rollback");
+			$result = $this->connection->rollback();
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -271,7 +275,7 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
-			$result =  mysql_query($sql);
+			$result =  $this->connection->query($sql);
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -303,16 +307,17 @@ class DbConnection {
 		 @param query Cadena con el query
 	*/
 	public function preparar($query) {
-		$this->prepareStatement = $this->randomString();
 		$this->logger->debug("SQL: ".$query);
 		$this->myFirePhp->log($query, "SQL");
+		
 		if ($this->driver == "PGSQL") {
- 			
+			
+			$this->prepareStatement = $this->randomString();
  			return pg_prepare($this->connection, $this->prepareStatement, $query);
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			//return mysql_error() . "(" . mysql_errno(); . ")";
+ 			return ($this->prepareStatement = $this->connection->prepare($query));
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -342,6 +347,8 @@ class DbConnection {
 	public function ejecutar($values) {
 		$this->logger->debug("Valores del prepared:".implode(",",$values) );
 		$this->myFirePhp->log($values, "Valores del prepared:");
+
+		$this->bindParams($values);
 		
 		if ($this->driver == "PGSQL") {
  			
@@ -349,7 +356,13 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			//return mysql_error() . "(" . mysql_errno(); . ")";
+ 			if ($this->prepareStatement->execute()) {
+ 				$res = $this->prepareStatement->get_result();
+ 				$this->prepareStatement->close(); 	
+ 				return $res;
+ 			} else {
+ 				return NULL;
+ 			} 
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -486,7 +499,7 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			return mysql_fetch_assoc($result);
+ 			return $result->fetch_assoc();
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -518,7 +531,7 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			return mysql_fetch_array($result);
+ 			return $result->fetch_array();
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -550,7 +563,7 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			//mysql_
+ 			$result->data_seek($pos);
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -665,6 +678,72 @@ class DbConnection {
  			
  			//return ora
  		}
+	}
+	
+
+	/** Retorna la variable utilizada por los prepareStatement
+	 * @param num Numero de secuencia.
+	 * @return String.
+	 */ 
+	public function getPreparedStatementVar($num) {
+		if ($this->driver == "PGSQL") {
+ 			
+ 			return "$" . $num;
+ 			
+ 		} elseif ($this->driver == "MYSQL") {
+ 			
+ 			return "?";
+ 			
+ 		} elseif ($this->driver == "DB2") {
+ 			
+			return "?";
+ 			
+ 		} elseif ($this->driver == "SQLITE") {
+ 			
+			return "?";
+ 			
+ 		} elseif ($this->driver == "ODBC") {
+ 			
+ 			return "?";
+ 			
+ 		} elseif ($this->driver == "ORACLE") {
+ 			
+ 			//return ora
+ 		}
+	}
+	
+	
+	/** Agrega los valores de los parámetros para el prepareStatement
+	 * @param values Array con valores.
+	 * @return void.
+	 */
+	public function bindParams($values) {
+		if ($this->driver == "PGSQL") {
+	
+			// N/A
+	
+		} elseif ($this->driver == "MYSQL") {
+	
+			foreach ($values as $key => $value) {
+				$this->prepareStatement->bind_param("s", $value);
+			}
+	
+		} elseif ($this->driver == "DB2") {
+	
+			return "?";
+	
+		} elseif ($this->driver == "SQLITE") {
+	
+			return "?";
+	
+		} elseif ($this->driver == "ODBC") {
+	
+			return "?";
+	
+		} elseif ($this->driver == "ORACLE") {
+	
+			//return ora
+		}
 	}
 }
 ?>
