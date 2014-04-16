@@ -715,5 +715,30 @@ class DbModel {
 		$this->clear();
 		return true;
 	}
+	
+	/** Ejecuta un SP
+	@param spName Nombre del SP.
+	@param params Lista de parametros.
+	*/
+	public function runSP($spName, $params) {
+		$sqlCall = "";
+		$sqlSelect = "";
+		$first = true;
+		foreach ($params as $key => $value) {
+			if ($first) {
+				$sqlCall = "@$value";
+				$sqlSelect = "@$value as $value";
+				$firts = false;
+			} else {
+				$sqlCall = $sqlCall . ", @" . $value;
+				$sqlSelect = $sqlCall . ", @$value as $value";
+			}
+		}
+		$sqlCall = "call $spName(". $sqlCall .")";
+		$sqlSelect = "SELECT $sqlSelect";
+		
+		
+		return ($this->execQuery($sqlCall) && $this->execQuery($sqlSelect));
+	}
 }
 ?>
