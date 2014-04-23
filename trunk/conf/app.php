@@ -67,4 +67,18 @@ define ("APP_STATUS", 1);
 define ("APP_STATUS_MESSAGE","ACTIVO");
 
 
+#----------------------------------------------------------------------
+# Section [i18n]
+# Valores relacionados al i18n
+# [Variables]
+#   DEFAULT_LANG       : Define el lenguaje por default
+#   I18N_METHOD        : Especifica el metodo empleado
+#                        [Posibles valores]
+#                           "DB"  : Base de datos (scripts de creacion de tablas: i18n.sql).
+#                           "XML" : (En desarrollo)
+#----------------------------------------------------------------------
+
+define ("DEFAULT_LANG", "es");
+define ("I18N_METHOD","DB");
+
 ?>
