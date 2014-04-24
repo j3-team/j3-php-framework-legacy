@@ -23,7 +23,7 @@ class i18n {
 		$this->logger = Logger::getRootLogger();
 	}
 	
-	public function translate($text, $lang) {
+	public function trans_to($text, $lang) {
 		$this->logger->debug("traslating to '$lang': ".$text);
 		$this->myFirePhp->log($text, "traslating to '$lang'");
 		
@@ -68,7 +68,7 @@ class i18n {
 		return $text;
 	}
 	
-	public function translate2($text) {
+	public function trans($text) {
 		if (isset($_SESSION["j3_jang"])) {
 			return i18n($text, $_SESSION["j3_jang"]);
 		}
