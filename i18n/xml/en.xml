@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<j3:j3_i18n xsi:schemaLocation="http://i18n.j3.com j3_i18n.xsd" xmlns:j3="http://i18n.j3.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<j3:phrases>
+		<j3:phrase>
+			<j3:text>Perro</j3:text>
+			<j3:trans>Dog</j3:trans>
+		</j3:phrase>
+	</j3:phrases>
+</j3:j3_i18n>
