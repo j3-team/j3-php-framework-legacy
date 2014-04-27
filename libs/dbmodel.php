@@ -14,6 +14,8 @@ define("DB_IN",        10);
 define("DB_NOT_IN",    11);
 define("DB_ASC",       12);
 define("DB_DESC",      13);
+define("DB_OWN_ID",    15);
+define("DB_SAME_FIELD",16);
 
 
 /** Clase para los modelos
@@ -32,6 +34,7 @@ class DbModel {
 	private $conditionFields;	
 	private $orderField;	
 	private $endIN;
+	private $idField;
 	
 	/** Constructor.
 	 * @param id. ID del registro (Si existe en la BD)
@@ -49,6 +52,19 @@ class DbModel {
 		
 		if ($id != null) {
 			$this->id = $id;
+		}
+
+		
+		$tableNameSingu = $this->tableName;
+		if ($tableNameSingu[strlen($tableNameSingu)-1] == "s")
+			$tableNameSingu = substr($tableNameSingu, 0, strlen($tableNameSingu)-1);
+		
+		if (DB_ID == 1) {
+			$this->idField = "id";
+		} else if (DB_ID == 2) {
+			$this->idField = "id_$tableNameSingu";
+		} else {
+			$this->idField = $tableNameSingu . "_id";
 		}
 	}
 	
@@ -159,7 +175,10 @@ class DbModel {
 		
 			try {
 				$this->conn->preparar("SELECT * FROM $this->tableName WHERE $condiciones $orders");
-				$this->result = $this->conn->ejecutar(array_values($this->conditionFields));
+				$this->result = $this->conn->ejecutar($this->conditionFields);
+				if (is_null($this->result)) {
+					return false;
+				}
 			} catch (Exception $e) {
 				throw $e;
 				return false;
@@ -177,7 +196,7 @@ class DbModel {
    */
 	public function doSelectOne($id) {
 		try {
-			$this->result = $this->conn->ejecutarSQL("SELECT * FROM $this->tableName WHERE id=$id");
+			$this->result = $this->conn->ejecutarSQL("SELECT * FROM $this->tableName WHERE $this->idField=$id");
 		} catch (Exception $e) {
 			throw $e;
 			return false;
@@ -185,38 +204,62 @@ class DbModel {
 		$this->clear();
 		return true;
 	}
+	
+	public function getTableIDName($tableName) {
+		$fieldName = "";
+		if ($tableName[strlen($tableName)-1] == "s")
+			$fieldName = substr($tableName, 0, strlen($tableName)-1);
+			
+		if (DB_ID == 3) {
+			$fieldName = "id_$fieldName";
+		} else {
+			$fieldName = $fieldName . "_id";
+		}
+		
+		return $fieldName;
+	}
 
 
 	/** Realiza un SELECT en la BD. Retorna todos los que coincidan.
        @param tableForeign Nombre de la tabla foranea
-       @param fieldName Nombre del campo que contiene la clave foranea. Si se omite se asume como "id_nombreTabla" en singular.
+       @param fieldName Nombre del campo que contiene la clave foranea.
        @return bool
 	*/
-	public function doSelectAllWithForeign($tableForeign, $fieldName = null) {
-		if ($fieldName == null) {
-			$fieldName = "id_$tableForeign";
-			if ($tableForeign[strlen($tableForeign)-1] == "s")
-				$fieldName = substr($fieldName, 0, strlen($fieldName)-1);
-		}
-		
+	public function doSelectAllWithForeign($tableForeign, $fieldName = null, $compareType = DB_OWN_ID) {
+
 		if ($this->tableName == null) {
 			throw new Exception ("Tabla no especificada");
 			return false;
 		}
-	
+		
+		if ($compareType == DB_OWN_ID) {
+			$idTableForeign = $this->getTableIDName($tableForeign);
+		} else {
+			$idTableForeign = $fieldName;
+		}
+		
+		
 		$condiciones = $this->getConditions();
 		
 		$orders = $this->getOrders();
 
 		if ($condiciones == null) {
 			try {
-				$this->result = $this->conn->ejecutarSQL("SELECT * FROM $this->tableName, $tableForeign WHERE $fieldName=$tableForeign.id $orders");
+				if ($fieldName == null) { //Relacion 1..n
+					$this->result = $this->conn->ejecutarSQL("SELECT * FROM $this->tableName, $tableForeign WHERE $this->tableName.$this->idField=$tableForeign.$idTableForeign $orders");
+				} else { //Relacion n..1
+					$this->result = $this->conn->ejecutarSQL("SELECT * FROM $this->tableName, $tableForeign WHERE $this->tableName.$fieldName=$tableForeign.$idTableForeign $orders");
+				}
 			} catch (Exception $e) {
 				throw $e;
 				return false;
 			}
 		} else {
-			$this->result = $this->conn->preparar("SELECT * FROM $this->tableName, $tableForeign WHERE $fieldName=$tableForeign.id AND $condiciones $orders");
+			if ($fieldName == null) { //Relacion 1..n
+				$this->result = $this->conn->preparar("SELECT * FROM $this->tableName, $tableForeign WHERE $this->tableName.$this->idField=$tableForeign.$idTableForeign AND $condiciones $orders");
+			} else {
+				$this->result = $this->conn->preparar("SELECT * FROM $this->tableName, $tableForeign WHERE $this->tableName.$fieldName=$tableForeign.$idTableForeign AND $condiciones $orders");
+			}
 		
 			try {
 				$this->result = $this->conn->ejecutar(array_values($this->conditionFields));
@@ -275,6 +318,10 @@ class DbModel {
 		}
 
 		$this->result = $this->conn->preparar("SELECT * FROM $this->tableName WHERE $field $comp $1");
+		if (is_null($this->result)) {
+			return false;
+		}
+		
 		try {
 			$this->result = $this->conn->ejecutar(array($value));
 		} catch (Exception $e) {
@@ -300,19 +347,42 @@ class DbModel {
 		$valores = "";
 		$keys = array_keys($this->fieldsByName);
 		for ($i=0; $i<count($keys); $i=$i+1) {
+			$val = $this->fieldsByName[ $keys[$i] ];
 			if ($i > 0) {
 				$campos = $campos . ", " . $keys[$i];
-				$valores = $valores . ", $" . ($i+1);
+				if ($val[0] == "%") { //is a db function
+					$valores = $valores . ", " . substr($val, 1);
+					unset($this->fieldsByName[ $keys[$i] ]);
+					array_splice($keys, $i, 1);
+					$i = $i-1;
+				} else {
+					$valores = $valores . ", " . $this->conn->getPreparedStatementVar($i+1);
+				}
 			} else {
-				$valores = "$" . ($i+1);
 				$campos = $keys[$i];
+				if ($val[0] == "%") { //is a db function
+					$valores = substr($val, 1);
+					unset($this->fieldsByName[ $keys[$i] ]);
+					array_splice($keys, $i, 1);
+					$i = $i-1;
+				} else {
+					$valores = $this->conn->getPreparedStatementVar($i+1);
+				}
+				
+				
 			}
 		}
 
 		$this->result = $this->conn->preparar("INSERT INTO $this->tableName ($campos) VALUES ($valores)");
+		if (is_null($this->result)) {
+			return false;
+		}
 		
 		try {
-			$this->result = $this->conn->ejecutar(array_values($this->fieldsByName));
+			$this->result = $this->conn->ejecutar($this->fieldsByName);
+			if (is_null($this->result)) {
+				return false;
+			}
 		} catch (Exception $e) {
 			throw $e;
 			return false;
@@ -340,17 +410,38 @@ class DbModel {
 		$valores = "";
 		$keys = array_keys($this->fieldsByName);
 		for ($i=0; $i<count($keys); $i=$i+1) {
+			$val = $this->fieldsByName[ $keys[$i] ];
 			if ($i > 0) {
-				$campos = $campos . ", " . $keys[$i] . "=$" . ($i+1);
+				if ($val[0] == "%") { //is a db function
+					$campos = $campos . ", " . $keys[$i] . "=" . substr($val, 1);
+					unset($this->fieldsByName[ $keys[$i] ]);
+					array_splice($keys, $i, 1);
+					$i = $i-1;
+				} else {
+					$campos = $campos . ", " . $keys[$i] . "=" . $this->conn->getPreparedStatementVar($i+1);
+				}
 			} else {
-				$campos = $keys[$i] . "=$" . ($i+1);
+				if ($val[0] == "%") { //is a db function
+					$campos = $keys[$i] . "=" . substr($val, 1);
+					unset($this->fieldsByName[ $keys[$i] ]);
+					array_splice($keys, $i, 1);
+					$i = $i-1;
+				} else {
+					$campos = $keys[$i] . "=" . $this->conn->getPreparedStatementVar($i+1);
+				}
 			}
 		}
 
-		$this->result = $this->conn->preparar("UPDATE $this->tableName SET $campos WHERE id=$this->id");
+		$this->result = $this->conn->preparar("UPDATE $this->tableName SET $campos WHERE $this->idField=$this->id");
+		if (is_null($this->result)) {
+			return false;
+		}
 		
 		try {
-			$this->result = $this->conn->ejecutar(array_values($this->fieldsByName));
+			$this->result = $this->conn->ejecutar($this->fieldsByName);
+			if (is_null($this->result)) {
+				return false;
+			}
 		} catch (Exception $e) {
 			throw $e;
 			return false;
@@ -361,10 +452,10 @@ class DbModel {
 	}
 
 
-    /** Realiza un DELETE en la BD.
+    /** Realiza un DELETE del registro en la BD.
         @return bool
     */
-    public function doDelete() {
+    public function doDeleteIt() {
 		if ($this->tableName == null) {
 			throw new Exception ("Tabla no especificada");
 			return false;
@@ -374,12 +465,48 @@ class DbModel {
 		}
 
 		try {
-			$this->result = $this->conn->ejecutarSQL("DELETE FROM $this->tableName WHERE id=$this->id");
+			$this->result = $this->conn->ejecutarSQL("DELETE FROM $this->tableName WHERE $this->idField=$this->id");
 		} catch (Exception $e) {
 			throw $e;
 			return false;
 		}
 	
+		$this->clear();
+		return true;
+	}
+	
+	/** 
+	 * Realiza un DELETE en la BD. Retorna todos los que coincidan.
+	 * @return bool.
+	 */
+	public function doDeleteAll() {
+		if ($this->tableName == null) {
+			throw new Exception ("Tabla no especificada");
+			return false;
+		}
+		
+		$condiciones = $this->getConditions();
+		
+		$orders = $this->getOrders();
+		
+		if ($condiciones == null) {
+			try {
+				$this->result = $this->conn->ejecutarSQL("xxxxxDELETE FROM $this->tableName $orders");
+			} catch (Exception $e) {
+				throw $e;
+				return false;
+			}
+		} else {
+		
+			try {
+				$this->conn->preparar("DELETE FROM $this->tableName WHERE $condiciones $orders");
+				$this->result = $this->conn->ejecutar($this->conditionFields);
+			} catch (Exception $e) {
+				throw $e;
+				return false;
+			}
+		}
+		
 		$this->clear();
 		return true;
 	}
@@ -391,7 +518,7 @@ class DbModel {
         @param compType Tipo de comparación (Igual, Menor, Mayor, Menor o igual, Mayor o igual).
         @return bool
     */
-    public function doDeleteAll($field, $value, $compType = DB_EQUAL) {
+    public function doDeleteAllWithCondition($field, $value, $compType = DB_EQUAL) {
 		if ($this->tableName == null) {
 			throw new Exception ("Tabla no especificada");
 			return false;
@@ -589,8 +716,8 @@ class DbModel {
 		$this->seek($this->cursor);
 		$this->fieldsByPos = $this->conn->getFetchArray($this->result);
 		$this->cursor = $this->cursor + 1;
-		if (isset($this->fieldsByName["id"]))
-			$this->id = $this->fieldsByName["id"];
+		if (isset($this->fieldsByName[$this->idField]))
+			$this->id = $this->fieldsByName[$this->idField];
 		return $this->fieldsByName;
 	}
 
@@ -643,14 +770,17 @@ class DbModel {
 	*/
 	public function getForeign($tableName, $fieldName = null) {
 		$tableName = strtolower($tableName);
+		
 		if ($fieldName == null) {
 			$fieldName = "id_$tableName";
 			if ($tableName[strlen($tableName)-1] == "s")
 				$fieldName = substr($fieldName, 0, strlen($fieldName)-1);
 		}
-	
+		
+		require_once("modelos/$tableName.php");
+		$tableName[0] = strtoupper($tableName[0]);
 		if (!class_exists($tableName))
-			throw new Exception("Tabla no existe");
+			throw new Exception("Tabla no existe ($tableName)");
 		else {
 			$cc = new $tableName;
 			$cc->doSelectOne( $this->getValue( $fieldName ) );
@@ -672,14 +802,19 @@ class DbModel {
 		@return int
 	*/
 	public function getLastId() {
-		if ($this->execQuery("SELECT MAX(id) FROM ".$this->tableName)) {
-			if ($this->next()) {
-				return $this->getValueByPos(0);
+		try {
+			if ($this->execQuery("SELECT MAX($this->idField) FROM ".$this->tableName)) {
+				if ($this->next()) {
+					return $this->getValueByPos(0);
+				} else {
+					return 0;
+				}
 			} else {
-				return 0;
+				return -1;
 			}
-		} else
+		} catch(Exception $e) {
 			return -1;
+		}
 	}
 	
 	
@@ -708,7 +843,7 @@ class DbModel {
 	*/
 	public function doUpdateBlob($field, $value) {
 		try {
-			$this->result = $this->conn->ejecutarSQL("UPDATE $this->tableName SET $field='{$value}' WHERE id=$this->id");
+			$this->result = $this->conn->ejecutarSQL("UPDATE $this->tableName SET $field='{$value}' WHERE $this->idField=$this->id");
 		} catch (Exception $e) {
 			throw $e;
 		}
@@ -739,6 +874,44 @@ class DbModel {
 		
 		
 		return ($this->execQuery($sqlCall) && $this->execQuery($sqlSelect));
+	}
+	
+	
+	/**
+	 * Realiza un SELECT COUNT en la BD.
+	 * @return bool.
+	*/
+	public function doSelectCount() {
+		if ($this->tableName == null) {
+			throw new Exception ("Tabla no especificada");
+			return false;
+		}
+	
+		$condiciones = $this->getConditions();
+	
+		$orders = $this->getOrders();
+	
+		if ($condiciones == null) {
+			try {
+				$this->result = $this->conn->ejecutarSQL("SELECT COUNT(*) FROM $this->tableName $orders");
+			} catch (Exception $e) {
+				throw $e;
+				return false;
+			}
+		} else {
+	
+			try {
+				$this->conn->preparar("SELECT COUNT(*) FROM $this->tableName WHERE $condiciones $orders");
+				$this->result = $this->conn->ejecutar(array_values($this->conditionFields));
+			} catch (Exception $e) {
+				throw $e;
+				return false;
+			}
+		}
+	
+		$this->clear();
+		
+		return $this->next();
 	}
 }
 ?>
