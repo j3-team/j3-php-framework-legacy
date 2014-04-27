@@ -1277,6 +1277,9 @@ function sabDomEntreFechas(fecha1, fecha2) {
 			MMMM	El nombre del mes ('enero' a 'diciembre')
 			yy		El año como número de 2 dígitos (00 to 99)
 			yyyy	El año como un número de 4 dígitos
+			hh		Horas
+			mm		Minutos
+			ss		Segundos
 	  @return Fecha actual en el formato dado.
 */
 function fechaActual(format) {
@@ -1287,7 +1290,7 @@ function fechaActual(format) {
 	var meses = new Array("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre");
 
 	var fecActual = new Date();
-	var d = fecActual.getDate()
+	var d = fecActual.getDate();
 	var M = fecActual.getMonth() + 1;
 	var yyyy = fecActual.getFullYear();
 	var yy = fecActual.getYear();
@@ -1297,6 +1300,12 @@ function fechaActual(format) {
 	var MMMM = meses[M-1];
 	var ddd = dddd.substring(0,3);
 	var MMM = MMMM.substring(0,3);
+	var h = fecActual.getHours();
+	var m = fecActual.getMinutes();
+	var s = fecActual.getSeconds();
+	var hh = "";
+	var mm = "";
+	var ss = "";
 	
 	if (d < 10)
 		dd = "0" + d;
@@ -1307,10 +1316,26 @@ function fechaActual(format) {
 		MM = "0" + M;
 	else
 		MM = "" + M;
+	
+	if (h < 10)
+		hh = "0" + h;
+	else
+		hh = "" + h;
+	
+	if (m < 10)
+		mm = "0" + m;
+	else
+		mm = "" + m;
 
+	if (s < 10)
+		ss = "0" + s;
+	else
+		ss = "" + s;
+	
 	return format.replace("yyyy", ""+yyyy).replace("yy", ""+yy)
 				 .replace("MMMM", MMMM).replace("MMM", MMM).replace("MM", MM).replace("M", ""+M)
-				 .replace("dddd", dddd).replace("ddd", ddd).replace("dd", dd).replace("d", ""+d);
+				 .replace("dddd", dddd).replace("ddd", ddd).replace("dd", dd).replace("d", ""+d)
+				 .replace("hh", hh).replace("mm", mm).replace("ss", ss);
 }
 
 /** * Función que me retorna el día de la semana.
