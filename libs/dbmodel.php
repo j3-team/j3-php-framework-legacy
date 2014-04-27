@@ -675,7 +675,7 @@ class DbModel {
 
     /** Asigna el valor dado al campo establecido. Se usa antes de un updateIt y SaveIt.
         @param field Campo a asignar el valor.
-        @param value Valor a asignar.
+        @param value Valor a asignar. Si es una función de BD, utilizar '%': (Ej. '%NOW()') 
     */
     public function setValue($field, $value) {
 		$this->fieldsByName[$field] = $value;
