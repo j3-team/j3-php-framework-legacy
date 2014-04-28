@@ -40,8 +40,8 @@ function continue_load($c) {
 		//$clase = $cc::getInstance($cc);
 		
 		if (APP_STATUS == 2 && strcmp($m, "notificacion") != 0) {
-			require_once("controladores/usuario_controller.php");
-			$clase = new UsuarioController();
+			require_once("controladores/generic_controller.php");
+			$clase = new GenericController();
 			$clase->ejecutar(strtolower($c),"mantenimiento");
 		}
 		else
