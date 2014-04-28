@@ -118,13 +118,14 @@ class Controller {
 				}
 			}
 			
-			if (file_exists("vistas/$name/index.php")) {
-				if ($this->continuar == true) {
+			if ($this->continuar == true) {
+				if (file_exists("vistas/$name/index.php")) {
 					$this->showView("vistas/$name/index.php");
-				}
-			} else {
-				echo "ERROR: Vista <strong>index.php</strong> no definida.  :(";
+				} else {
+					echo "ERROR: Vista <strong>index.php</strong> no definida.  :(";
+				}				
 			}
+
 		}		
 	}
 	
@@ -283,6 +284,13 @@ class Controller {
 		//$_GET["base_path"] = APP_URL;
 
 		require_once("libs/DomPDF/dompdf.php");
+	}
+
+	
+	public function mantenimiento()
+	{
+		$this->continuar=false;
+		$this->showNotificacion("","<br/><br/><br/><br/><br/><br/>".APP_STATUS_MESSAGE,"","",APP_TITLE,"En mantenimiento");
 	}
 }
 
