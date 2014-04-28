@@ -121,11 +121,20 @@ class DbModel {
 		$condiciones = null;
 
 		$i = 0;
-		if (is_array($this->conditionFields))
+		$j = 0;
+		if (is_array($this->conditionFields)) {
 			foreach ($this->conditionFields as $key => $value) {
-				$condiciones = $condiciones . $this->getOperator($i, $key, $this->conditionOperators[$i]) . $this->conn->getPreparedStatementVar($i+1);
-				$i = $i+1;
+				if ($value[0] == "%") { //is a db function
+					$condiciones = $condiciones . $this->getOperator($i+$j, $key, $this->conditionOperators[$i]) . substr($value, 1);
+					unset($this->conditionFields[ $key ]);
+					array_splice($this->conditionOperators, $i, 1);
+					$j = 1;
+				} else {
+					$condiciones = $condiciones . $this->getOperator($i+$j, $key, $this->conditionOperators[$i]) . $this->conn->getPreparedStatementVar($i+1);
+					$i = $i+1;
+				}	
 			}
+		}
 			
 		if ($this->endIN == true) {
 			$this->endIN = false;
