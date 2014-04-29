@@ -17,6 +17,8 @@ class DbConnection {
 	private $myFirePhp;
 	private $logger;
 	
+	private $arrayFields; //Only MYSQLI prepared stmts
+	
 	
 	/** Constructor parametrizable
 		 @param driver Nombre del driver a utilizar
@@ -317,6 +319,7 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
+ 			$this->arrayFields = null;
  			return ($this->prepareStatement = $this->connection->prepare($query));
  			
  		} elseif ($this->driver == "DB2") {
@@ -357,9 +360,19 @@ class DbConnection {
  		} elseif ($this->driver == "MYSQL") {
  			if ($this->prepareStatement->execute()) {
  				$this->myFirePhp->log("OK");
- 				$res = $this->prepareStatement->get_result();
- 				$this->prepareStatement->close(); 	
- 				return $res;
+ 				//$res = $this->prepareStatement->get_result();
+ 				//$this->prepareStatement->close();
+
+ 				//get field names
+ 				$meta = $this->prepareStatement->result_metadata();
+ 				$this->arrayFields = array();
+ 				$params = array();
+ 				while($field = $meta->fetch_field()) {
+			        $params[] = &$this->arrayFields[$field->name];
+			    }
+			    call_user_func_array(array($this->prepareStatement, 'bind_result'), $params);
+			    
+ 				return $this->prepareStatement;
  			} else {
  				$this->myFirePhp->log("KO: " . $this->getLastError());
  				return NULL;
@@ -500,7 +513,16 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			return $result->fetch_assoc();
+ 			//return $result->fetch_assoc();
+ 			if (is_null($this->prepareStatement)) { //normal stmt
+ 				return $result->fetch_assoc();
+ 			} else { // prepared stmt
+ 				if ($this->prepareStatement->fetch()) {
+ 					return $this->arrayFields;
+ 				} else {
+ 					return null;
+ 				}
+ 			} 			
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -532,7 +554,16 @@ class DbConnection {
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			return $result->fetch_array();
+ 			//return $result->fetch_array();
+ 			if (is_null($this->prepareStatement)) { //normal stmt
+ 				return $result->fetch_array();
+ 			} else { // prepared stmt
+ 				if ($this->prepareStatement->fetch()) {
+ 					return array_values($this->arrayFields);
+ 				} else {
+ 					return null;
+ 				}
+ 			}
  			
  		} elseif ($this->driver == "DB2") {
  			

@@ -10,6 +10,21 @@ $array = explode('/', $_SERVER["REQUEST_URI"],3);
 
 
 #----------------------------------------------------------------------
+# Section [FILESYSTEM]
+# Opciones de donde se encuentre alojado la app
+#
+# [Variables]
+#   FS_TYPE : Define el tipo de ubicacion de la app
+#             [Posibles valores]
+#                1 : (FOLDER) Normalmente en entornos de desarrollo.
+#                    Ubicado en una carpeta dentro del sitio del apache.
+#                2 : (ROOT) Ubicado en la raiz del servidor.
+#                    Normalmente para entornos de producción.
+#----------------------------------------------------------------------
+define ("FS_TYPE", 1);
+
+
+#----------------------------------------------------------------------
 # Section [RUTAS]
 # Creadas por default
 # Normalmente se dejan tal cual aparecen
@@ -20,9 +35,9 @@ $array = explode('/', $_SERVER["REQUEST_URI"],3);
 #   APP_BASE : Define el path base de la aplicacion
 #----------------------------------------------------------------------
 
-define ("APP_PATH", $_SERVER['HTTP_HOST'].'/'.$array[1]);
+define ("APP_PATH", $_SERVER['HTTP_HOST'].(FS_TYPE == 1 ? ('/'.$array[1]) : ''));
 define ("APP_URL",  'http://'.APP_PATH.'/');
-define ("APP_BASE", "<base href='". APP_URL ."' />");
+define ("APP_BASE", '<base href="'. APP_URL .'" />');
 
 
 #----------------------------------------------------------------------
@@ -33,8 +48,8 @@ define ("APP_BASE", "<base href='". APP_URL ."' />");
 #   APP_DEFAULT : controlador/metodo por defecto a mostrar. Si es vacio, se accede a la pagina de bienvenida del framework.
 #----------------------------------------------------------------------
 
-define ("APP_TITLE", "Titulo");
-#define ("APP_DEFAULT", "controlador/metodo");
+define ("APP_TITLE", "Barticker");
+define ("APP_DEFAULT", "home");
 
 	
 #----------------------------------------------------------------------
@@ -79,6 +94,6 @@ define ("APP_STATUS_MESSAGE","ACTIVO");
 #----------------------------------------------------------------------
 
 define ("DEFAULT_LANG", "es");
-define ("I18N_METHOD","DB");
+define ("I18N_METHOD","XML");
 
 ?>
