@@ -3,6 +3,7 @@ include("libs/log4php/Logger.php");
 require_once("libs/FirePHPCore/FirePHP.class.php");
 require_once("libs/localuser.php");
 require_once("libs/DomPDF/dompdf_config.inc.php");
+require_once("libs/j3_utils.php");
 
 /** Clase principal de los controladores.
 	Incluye metodos utilizados frecuentemente.
@@ -55,6 +56,11 @@ class Controller {
           exit(0);
      }    
 	
+     public function put_response($text) {
+     	header("HTTP/1.1 200 OK");
+     	header('Content-Type: text/html; charset=utf-8');
+     	echo $text;
+     }
 	
 	/** Metodo que ejecuta una vista especifica
 		@param name Nombre del controlador
