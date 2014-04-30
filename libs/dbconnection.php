@@ -366,7 +366,7 @@ class DbConnection {
 
  				//get field names
  				$meta = $this->prepareStatement->result_metadata();
- 				if (!is_null($meta)) {
+ 				if (!is_null($meta) && $meta !== FALSE) {
  					$this->arrayFields = array();
  					$params = array();
  					while($field = $meta->fetch_field()) {
