@@ -902,7 +902,7 @@ class DbModel {
 	
 		if ($condiciones == null) {
 			try {
-				$this->result = $this->conn->ejecutarSQL("SELECT COUNT(*) FROM $this->tableName $orders");
+				$this->result = $this->conn->ejecutarSQL("SELECT COUNT(*) as count FROM $this->tableName $orders");
 			} catch (Exception $e) {
 				throw $e;
 				return false;
@@ -910,7 +910,7 @@ class DbModel {
 		} else {
 	
 			try {
-				$this->conn->preparar("SELECT COUNT(*) FROM $this->tableName WHERE $condiciones $orders");
+				$this->conn->preparar("SELECT COUNT(*) as count FROM $this->tableName WHERE $condiciones $orders");
 				$this->result = $this->conn->ejecutar(array_values($this->conditionFields));
 			} catch (Exception $e) {
 				throw $e;

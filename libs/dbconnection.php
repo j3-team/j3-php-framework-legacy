@@ -360,18 +360,21 @@ class DbConnection {
  		} elseif ($this->driver == "MYSQL") {
  			if ($this->prepareStatement->execute()) {
  				$this->myFirePhp->log("OK");
+ 				$this->prepareStatement->store_result();
  				//$res = $this->prepareStatement->get_result();
  				//$this->prepareStatement->close();
 
  				//get field names
  				$meta = $this->prepareStatement->result_metadata();
- 				$this->arrayFields = array();
- 				$params = array();
- 				while($field = $meta->fetch_field()) {
-			        $params[] = &$this->arrayFields[$field->name];
-			    }
-			    call_user_func_array(array($this->prepareStatement, 'bind_result'), $params);
-			    
+ 				if (!is_null($meta)) {
+ 					$this->arrayFields = array();
+ 					$params = array();
+ 					while($field = $meta->fetch_field()) {
+ 						$params[] = &$this->arrayFields[$field->name];
+ 					}
+ 					call_user_func_array(array($this->prepareStatement, 'bind_result'), $params);
+ 					$this->myFirePhp->log($this->arrayFields, "Fields");
+ 				}
  				return $this->prepareStatement;
  			} else {
  				$this->myFirePhp->log("KO: " . $this->getLastError());
