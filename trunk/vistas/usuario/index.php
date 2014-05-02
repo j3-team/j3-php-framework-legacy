@@ -1,7 +1,7 @@
 <script language="javascript">
 	function registrar()
 	{	
-		location.href="usuario/requisitos";
+		location.href="usuario/registro";
 	}
 	
 	function olvido()
@@ -46,9 +46,8 @@
 	<table align="center" border="0" cellpadding="0" cellspacing="15" width="99%">
 		<tr>
 			<td class="celBlanca" colspan="2">
-				<p align="justify">&nbsp;Bienvenido al M&oacute;dulo de
-				Preinscripci&oacute;n en L&iacute;nea de la <b>Escuela Nacional de
-				Fiscales</b>&nbsp;</p>
+				<p align="justify">&nbsp;Bienvenidos al M&oacute;dulo de
+				Preinscripci&oacute;n en L&iacute;nea de la <b>XXXXX</b>&nbsp;</p>
 			</td>
 		</tr>
 		<tr>
@@ -63,13 +62,13 @@
 					</tr>
 					<tr>
 						<td class="celBlanca" width="40%">
-						<div align="right">&nbsp;Usuario (alias) <span style="color: red;">*</span></div>
+						<div align="right">&nbsp;Usuario (alias): <span style="color: red;">*</span></div>
 						</td>
 						<td class="celBlancaFin" width="60%">&nbsp;<input type="text" name="alias" id="alias" value="" size="20" maxlength="100" /></td>
 					</tr>
 					<tr>
 						<td class="celBlanca">
-						<div align="right">&nbsp;Contrase&ntilde;a <span style="color: red;">*</span></div>
+						<div align="right">&nbsp;Contrase&ntilde;a: <span style="color: red;">*</span></div>
 						</td>
 						<td class="celBlancaFin">&nbsp;<input type="password" name="clave" id="clave" value="" size="20" maxlength="10" /></td>
 					</tr>
@@ -124,7 +123,7 @@
 			<td class="celBlanca" colspan="2" style="text-align: center;">
 				<p align="justify">
 					&nbsp;Para cualquier pregunta o duda, por favor escriba a 
-					<a href="mailto:escuela.fiscales@mp.gob.ve" class="link1">escuela.fiscales@mp.gob.ve</a>&nbsp;
+					<a href="mailto:mail@dominio.com" class="link1">mail@dominio.com</a>&nbsp;
 				</p>
 			</td>
 		</tr>

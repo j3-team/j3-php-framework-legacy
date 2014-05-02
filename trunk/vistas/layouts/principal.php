@@ -11,7 +11,7 @@
         <script type="text/javascript">
             window.onload = function(){
                 var margen = 200;
-                var widthAplicacion = 800;
+                var widthAplicacion = 1000;
                 var widthPantalla = document.body.clientWidth - margen - widthAplicacion;
                 document.getElementById('divContenedor').style.marginLeft = 100 + (widthPantalla/2);
                 document.getElementById('divBanner').style.marginLeft = 100 + (widthPantalla/2);
