@@ -144,11 +144,11 @@
 		<tr>
 			<td width="22%" align="right">&nbsp;Nombres&nbsp;<span style="color:red;">*</span>&nbsp;</td>
 			<td width="28%">
-				<input type="text" name="nombres" id="nombres" value="<?php print $this->persona->getValue("nombres");?>" size="31" maxlength="100" class="campoTexto" onKeyUp="this.value = this.value.toUpperCase();"/>
+				<input type="text" name="nombres" id="nombres" value="<?php print $this->persona->getValue("nombres");?>" size="31" maxlength="100" class="j3-inputText" onKeyUp="this.value = this.value.toUpperCase();"/>
 			</td>
 			<td width="22%" align="right">&nbsp;Apellidos&nbsp;<span style="color:red;">*</span>&nbsp;</td>
 			<td width="28%">
-				<input type="text" name="apellidos" id="apellidos" value="<?php print $this->persona->getValue("apellidos");?>" size="31" maxlength="100" class="campoTexto" onKeyUp="this.value = this.value.toUpperCase();"/>
+				<input type="text" name="apellidos" id="apellidos" value="<?php print $this->persona->getValue("apellidos");?>" size="31" maxlength="100" class="j3-inputText" onKeyUp="this.value = this.value.toUpperCase();"/>
 			</td>
 		</tr>
 		<tr>

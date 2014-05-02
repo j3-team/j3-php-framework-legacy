@@ -55,7 +55,7 @@
 		</tr>
 		<tr>
 			<td width="50%" valign="top" align="center">
-				<div class="frame">
+				<div class="j3-frame-blue">
 				<table align="center" border="0" cellpadding="2" cellspacing="2" width="85%">
 					<tr>
 						<td align="center" colspan="2">&nbsp;<b class="tituloLogin">INICIAR SESI&Oacute;N</b>&nbsp;<br/><br/></td>
@@ -64,13 +64,13 @@
 						<td class="celBlanca" width="40%">
 						<div align="right">&nbsp;Usuario (alias): <span style="color: red;">*</span></div>
 						</td>
-						<td class="celBlancaFin" width="60%">&nbsp;<input type="text" name="alias" id="alias" value="" size="20" maxlength="100" /></td>
+						<td class="celBlancaFin" width="60%">&nbsp;<input type="text" name="alias" id="alias" value="" size="20" maxlength="100" class="j3-inputText"/></td>
 					</tr>
 					<tr>
 						<td class="celBlanca">
 						<div align="right">&nbsp;Contrase&ntilde;a: <span style="color: red;">*</span></div>
 						</td>
-						<td class="celBlancaFin">&nbsp;<input type="password" name="clave" id="clave" value="" size="20" maxlength="10" /></td>
+						<td class="celBlancaFin">&nbsp;<input type="password" name="clave" id="clave" value="" size="20" maxlength="10" class="j3-inputText"/></td>
 					</tr>
 					<tr>
 						<td colspan="2" class="msjError" align="center">
@@ -79,34 +79,34 @@
 					</tr>
 					<tr>
 						<td colspan="2" align="center">
-						<div align="center"><input type="submit" name="btnLogin" value="Login" class="boton">&nbsp;&nbsp; </div>
+						<div align="center"><input type="submit" name="btnLogin" value="Login" class="j3-button j3-button-blue">&nbsp;&nbsp; </div>
 						</td>
 					</tr>
 				</table><br/>
 				</div>
 			</td>
 			<td width="50%" align="center">
-				<div class="frame">
+				<div class="j3-frame-blue">
 				<table align="center" border="0" cellpadding="2" cellspacing="2" width="80%">
 					<tr>
 						<td align="center" colspan="2">&nbsp;<b class="tituloLogin">&iquest;NO EST&Aacute; REGISTRADO&#63;</b>&nbsp;</td>
 					</tr>
 					<tr>
 						<td align="center">
-							-> Haga Click&nbsp; <input type="button" name="btnAqui" value="Aqu&iacute;" class="boton" onClick="registrar();">
+							-> Haga Click&nbsp; <input type="button" name="btnAqui" value="Aqu&iacute;" class="j3-button j3-button-blue" onClick="registrar();">
 						</td>
 					</tr>
 				</table>
 				</div>
 				<br/>
-				<div class="frame">
+				<div class="j3-frame-blue">
 				<table align="center" border="0" cellpadding="2" cellspacing="2" width="80%">
 					<tr>
 						<td align="center" colspan="2">&nbsp;<b class="tituloLogin">&iquest;OLVID&Oacute; SU CONTRASE&Ntilde;A&#63;</b>&nbsp;</td>
 					</tr>
 					<tr>
 						<td align="center">
-							-> Haga Click&nbsp; <input type="button" name="btnAqui2" value="Aqu&iacute;" class="boton" onClick="olvido();">
+							-> Haga Click&nbsp; <input type="button" name="btnAqui2" value="Aqu&iacute;" class="j3-button j3-button-blue" onClick="olvido();">
 						</td>
 					</tr>
 				</table>
