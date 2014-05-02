@@ -46,17 +46,17 @@ function enviarCorreo($email,$usuario,$asunto,$mensaje,$archivos=array())
 	$mail->IsSMTP();
 	//$mail->SMTPAuth=true;				//enable SMTP authentication
 	//$mail->SMTPSecure="ssl";          //sets the prefix to the servier
-	$mail->Host="172.16.16.91";      	//sets the SMTP server
+	$mail->Host="ipservermail";      	//sets the SMTP server
 	$mail->Port=25;                   	//set the SMTP port
-	$mail->Username= "jean.nizama"; 	//username
+	$mail->Username= "nombreusuario"; 	//username
 	$mail->Password= "12345678";        //password
-	$mail->From= "escuela.fiscales@mp.gob.ve";
-	$mail->FromName="Escuela Nacional de Fiscales";
+	$mail->From= "mail@dominio.com";
+	$mail->FromName="Sistema XXXX";
 	$mail->Subject=$asunto;
 	//$mail->AltBody    = "This is the body when user views in plain text format"; //Text Body
 	$mail->WordWrap   = 80; // set word wrap
 	$mail->MsgHTML($mensaje);
-	$mail->AddReplyTo("escuela.fiscales@mp.gob.be","Escuela Nacional de Fiscales");
+	$mail->AddReplyTo("mail@dominio.com","Sistema XXX");
 	$totalElementos = count($archivos);
 	for ($i = 0; $i < $totalElementos; $i++) 
 	{
