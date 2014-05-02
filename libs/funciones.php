@@ -11,6 +11,7 @@ include("libs/phpmailer/class.smtp.php");
  **********************************************************/
 function randomText($length,$type) 
 {
+	$key="";
 	switch ($type)
 	{
 		case 0: 
