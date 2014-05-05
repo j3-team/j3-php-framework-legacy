@@ -23,6 +23,7 @@ p {
 
 #divContenedor{
     width: 1000px;
+	margin: 0 auto 0 auto;
 }
 
 #divCabecera{    
@@ -32,6 +33,7 @@ p {
 #divCabecera #divBanner{
     background:  url('../imgs/company_logo.png') no-repeat;
     height: 160px;
+	margin: 0 auto 0 auto;
 }
 
 #divCuerpo{
