@@ -1,18 +1,28 @@
+<link rel="stylesheet" type='text/css' href="recursos/css/modal.css"/>
+<script type="text/javascript" src="recursos/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="recursos/js/modal.js"></script>
+
 <script language="javascript">
 	function registrar()
 	{	
 		location.href="usuario/registro";
 	}
+
+	function confirmar()
+	{	
+		
+		callModal("Confirmaci&oacute;n","Esta seguro que olvid&oacute; la clave?","Yes","No","olvido");
+	}
 	
 	function olvido()
-	{	
+	{
 		location.href="usuario/olvidoclave";
 	}
 	
 	function validar()
 	{
 		var validate=true;
-		var msj="Estimado Usuario, verifique los siguientes campos:\n";
+		var msj="Estimado Usuario, verifique los siguientes campos:<br/>";
 		var regexp;
 		
 		//validando formulario
@@ -20,18 +30,19 @@
 		regexp = /\w+[0-9]*/;
 		if(document.getElementById('alias').value.search(regexp))
 		{
-			msj=msj+"- Usuario (alias)\n ";
+			msj=msj+"- Usuario (alias)<br/>";
 			validate=false;
 		}
 		regexp = /\w+[0-9]*/;
 		if(document.getElementById('clave').value.search(regexp))
 		{
-			msj=msj+"- Contrase\u00f1a\n ";
+			msj=msj+"- Contrase&ntilde;a<br/> ";
 			validate=false;
 		}
 		if (!validate)
 		{
-			alert(msj);
+			//alert(msj);
+			callModal("Validaci&oacute;n",msj,"Aceptar","","");
 			return false;		
 		}
 		else
@@ -93,7 +104,7 @@
 					</tr>
 					<tr>
 						<td align="center">
-							-> Haga Click&nbsp; <input type="button" name="btnAqui" value="Aqu&iacute;" class="j3-button j3-button-blue" onClick="registrar();">
+							-> Haga Click&nbsp; <input type="button" id="btnRegistro" name="btnRegistro" value="Aqu&iacute;" class="j3-button j3-button-blue" onClick="registrar();">
 						</td>
 					</tr>
 				</table>
@@ -106,7 +117,7 @@
 					</tr>
 					<tr>
 						<td align="center">
-							-> Haga Click&nbsp; <input type="button" name="btnAqui2" value="Aqu&iacute;" class="j3-button j3-button-blue" onClick="olvido();">
+							-> Haga Click&nbsp; <input type="button" id="btnOlvido" name="btnOlvido" value="Aqu&iacute;" class="j3-button j3-button-blue" onClick="confirmar();"/>
 						</td>
 					</tr>
 				</table>
@@ -129,3 +140,18 @@
 		</tr>
 	</table>
 </form>
+<div id="modal">
+	<div class="modal-content">
+		<div class="modal-header">
+			<h2>Modal Heading</h2>
+		</div>
+		<div class="modal-msj">
+			<p align="justify">Texto</p>
+		</div>
+		<div class="cf footer">
+			<input type="button" id="btn_modal_1" name="btn_modal_1" value="1" class="j3-button j3-button-blue"/>
+			<input type="button" id="btn_modal_2" name="btn_modal_2" value="2" class="j3-button j3-button-blue"/>
+		</div>
+	</div>
+	<div class="overlay"></div>
+</div>
