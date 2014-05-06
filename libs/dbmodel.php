@@ -35,11 +35,17 @@ class DbModel {
 	private $orderField;	
 	private $endIN;
 	private $idField;
+	private $myFirePhp;
 	
 	/** Constructor.
 	 * @param id. ID del registro (Si existe en la BD)
 	 */
 	public function __construct($id = null) {
+		
+		//Firebug
+		ob_start();
+		$this->myFirePhp = FirePHP::getInstance(true);
+		
 		try {
 			$this->conn = new DbConnection();
 			$this->conn->conectar();
@@ -95,9 +101,9 @@ class DbModel {
 	}
 	
 	
-	private function getOperator($i, $k, $o) {
+	private function getOperator($i, $k, $o, $p) {
 		if (strcmp($o, "##") != 0) {
-			$cond = $k . $o;
+			$cond = (is_null($p) ? "" : "$p.") . $k . $o;
 			if ($i > 0) {
 				if ($this->endIN == true) {
 					$this->endIN = false;
@@ -114,9 +120,12 @@ class DbModel {
 		}
 	}
 	
-	/** Genera la tira SQL con las condiciones
+	/** 
+	 * Genera la tira SQL con las condiciones
+	 * @param string $prefix Prefijo de la tabla
+	 * @return array condiciones
 	*/
-	private function getConditions() {
+	private function getConditions($prefix = NULL) {
 		
 		$condiciones = null;
 
@@ -125,12 +134,12 @@ class DbModel {
 		if (is_array($this->conditionFields)) {
 			foreach ($this->conditionFields as $key => $value) {
 				if ($value[0] == "%") { //is a db function
-					$condiciones = $condiciones . $this->getOperator($i+$j, $key, $this->conditionOperators[$i]) . substr($value, 1);
+					$condiciones = $condiciones . $this->getOperator($i+$j, $key, $this->conditionOperators[$i], $prefix) . substr($value, 1);
 					unset($this->conditionFields[ $key ]);
 					array_splice($this->conditionOperators, $i, 1);
 					$j = 1;
 				} else {
-					$condiciones = $condiciones . $this->getOperator($i+$j, $key, $this->conditionOperators[$i]) . $this->conn->getPreparedStatementVar($i+1);
+					$condiciones = $condiciones . $this->getOperator($i+$j, $key, $this->conditionOperators[$i], $prefix) . $this->conn->getPreparedStatementVar($i+1);
 					$i = $i+1;
 				}	
 			}
@@ -219,7 +228,7 @@ class DbModel {
 		if ($tableName[strlen($tableName)-1] == "s")
 			$fieldName = substr($tableName, 0, strlen($tableName)-1);
 			
-		if (DB_ID == 3) {
+		if (DB_ID == 2) {
 			$fieldName = "id_$fieldName";
 		} else {
 			$fieldName = $fieldName . "_id";
@@ -248,16 +257,16 @@ class DbModel {
 		}
 		
 		
-		$condiciones = $this->getConditions();
+		$condiciones = $this->getConditions("a");
 		
 		$orders = $this->getOrders();
 
 		if ($condiciones == null) {
 			try {
 				if ($fieldName == null) { //Relacion 1..n
-					$this->result = $this->conn->ejecutarSQL("SELECT * FROM $this->tableName, $tableForeign WHERE $this->tableName.$this->idField=$tableForeign.$idTableForeign $orders");
+					$this->result = $this->conn->ejecutarSQL("SELECT * FROM $this->tableName a, $tableForeign b WHERE a.$this->idField=b.$idTableForeign $orders");
 				} else { //Relacion n..1
-					$this->result = $this->conn->ejecutarSQL("SELECT * FROM $this->tableName, $tableForeign WHERE $this->tableName.$fieldName=$tableForeign.$idTableForeign $orders");
+					$this->result = $this->conn->ejecutarSQL("SELECT * FROM $this->tableName a, $tableForeign b WHERE a.$fieldName=b.$idTableForeign $orders");
 				}
 			} catch (Exception $e) {
 				throw $e;
@@ -265,9 +274,9 @@ class DbModel {
 			}
 		} else {
 			if ($fieldName == null) { //Relacion 1..n
-				$this->result = $this->conn->preparar("SELECT * FROM $this->tableName, $tableForeign WHERE $this->tableName.$this->idField=$tableForeign.$idTableForeign AND $condiciones $orders");
+				$this->result = $this->conn->preparar("SELECT * FROM $this->tableName a, $tableForeign b WHERE a.$this->idField=b.$idTableForeign AND $condiciones $orders");
 			} else {
-				$this->result = $this->conn->preparar("SELECT * FROM $this->tableName, $tableForeign WHERE $this->tableName.$fieldName=$tableForeign.$idTableForeign AND $condiciones $orders");
+				$this->result = $this->conn->preparar("SELECT * FROM $this->tableName a, $tableForeign b WHERE a.$fieldName=b.$idTableForeign AND $condiciones $orders");
 			}
 		
 			try {
