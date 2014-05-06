@@ -48,8 +48,8 @@ define ("APP_BASE", '<base href="'. APP_URL .'" />');
 #   APP_DEFAULT : controlador/metodo por defecto a mostrar. Si es vacio, se accede a la pagina de bienvenida del framework.
 #----------------------------------------------------------------------
 
-define ("APP_TITLE", "Barticker");
-define ("APP_DEFAULT", "home");
+define ("APP_TITLE", "J3 PHP Framework");
+#define ("APP_DEFAULT", "home");
 
 	
 #----------------------------------------------------------------------
