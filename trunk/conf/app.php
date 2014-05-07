@@ -51,6 +51,24 @@ define ("APP_BASE", '<base href="'. APP_URL .'" />');
 define ("APP_TITLE", "J3 PHP Framework");
 #define ("APP_DEFAULT", "home");
 
+
+#----------------------------------------------------------------------
+# Section [PERMISSIONS]
+# Seccion donde se establece el comportamiento del sistema en caso de que el usuario no tenga
+# acceso a una funcionalidad. 
+# [Variables]
+#   DENIED_ACTION : Accion a ejecutar por el sistema.
+#                   [Posibles valores]
+#                      1 : Notificacion
+#                      2 : Redireccion
+#   DENIED_MSG    : Mensaje a mostrar en caso de action=1
+#   DENIED_PAGE   : Pagina a redireccionar en caso de action=2
+#----------------------------------------------------------------------
+
+define ("DENIED_ACTION", 1);
+define ("DENIED_MSG", "No permitido!");
+define ("DENIED_PAGE", "home");
+
 	
 #----------------------------------------------------------------------
 # Section [SESIONES]

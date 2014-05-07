@@ -228,7 +228,11 @@ class Controller {
 	/** Funcion que se ejecuta cuando un usuario no está permitido en la funcionalidad
 	*/
 	public function userNotAllowed() {
-		echo "Usuario no permitido";
+		if (DENIED_ACTION == 1) {
+			echo DENIED_MSG;
+		} else {
+			$this->redirect(DENIED_PAGE);
+		}
 	}
 	
 
@@ -297,6 +301,16 @@ class Controller {
 	{
 		$this->continuar=false;
 		$this->showNotificacion("","<br/><br/><br/><br/><br/><br/>".APP_STATUS_MESSAGE,"","",APP_TITLE,"En mantenimiento");
+	}
+	
+	/**
+	 * Agrega un nuevo valor al mensaje (recibido por parametro)
+	 * Esta función es útil para almacenar en una misma variable varios valores
+	 * que dados como respuesta (Al ciente JavaScript) luego son extraídos en JavaScript
+	 * a traves de la función getValMsgByPos.
+	 */
+	public function addValMsg(&$m, $v){
+		$m = $m."/,/".$v;
 	}
 }
 
