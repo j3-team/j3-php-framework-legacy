@@ -1,6 +1,7 @@
 <?php
-include("libs/phpmailer/class.phpmailer.php");
-include("libs/phpmailer/class.smtp.php");
+#include("libs/phpmailer/class.phpmailer.php");
+#include("libs/phpmailer/class.smtp.php");
+require_once 'conf/mail.php';
 
  /*********************************************************
  * Author    : Jean Nizama
@@ -11,7 +12,6 @@ include("libs/phpmailer/class.smtp.php");
  **********************************************************/
 function randomText($length,$type) 
 {
-	$key="";
 	switch ($type)
 	{
 		case 0: 
@@ -43,34 +43,59 @@ function randomText($length,$type)
 function enviarCorreo($email,$usuario,$asunto,$mensaje,$archivos=array())
 {
 	$mail=new PHPMailer();
+	
+	$mail->SMTPDebug  = MAIL_DEBUG;
+	
 	$mail->IsSMTP();
-	//$mail->SMTPAuth=true;				//enable SMTP authentication
-	//$mail->SMTPSecure="ssl";          //sets the prefix to the servier
-	$mail->Host="ipservermail";      	//sets the SMTP server
-	$mail->Port=25;                   	//set the SMTP port
-	$mail->Username= "nombreusuario"; 	//username
-	$mail->Password= "12345678";        //password
-	$mail->From= "mail@dominio.com";
-	$mail->FromName="Sistema XXXX";
+	$mail->SMTPAuth=true;
+	
+	$mail->Host= MAIL_HOST;
+	$mail->Port= MAIL_PORT;
+	
+	$mail->Username= MAIL_USER;
+	$mail->Password= MAIL_PASS;
+	
+	if (defined("MAIL_SECURE_SMTP")) {
+		$mail->SMTPSecure= MAIL_SECURE_SMTP;
+	}
+	
+	if (defined("MAIL_FROM")) {
+		$mail->SetFrom(MAIL_FROM, MAIL_FROMNAME);
+		
+		if ( MAIL_REPLYTO == 1 ) {
+			$mail->AddReplyTo(MAIL_FROM, MAIL_FROMNAME);
+		}
+	}
+	
+	$mail->SMTPKeepAlive = true;
+	
+	$mail->WordWrap   = MAIL_WORDWRAP; // set word wrap
+	
+	
 	$mail->Subject=$asunto;
-	//$mail->AltBody    = "This is the body when user views in plain text format"; //Text Body
-	$mail->WordWrap   = 80; // set word wrap
+	$mail->AddAddress($email,$usuario);
+	$mail->IsHTML(true); // send as HTML
 	$mail->MsgHTML($mensaje);
-	$mail->AddReplyTo("mail@dominio.com","Sistema XXX");
+	
+	//attachments
 	$totalElementos = count($archivos);
 	for ($i = 0; $i < $totalElementos; $i++) 
 	{
 		$mail->AddAttachment($array[$i], $array[$i+1]); // attachment
 		$i++;
 	}
-	$mail->AddAddress($email,$usuario);
-	$mail->IsHTML(true); // send as HTML
+	
+	//send
 	if(!$mail->Send()) 
 	{
 		throw new Exception("Error al Enviar Correo Electr&oacute;nico.- ".$mail->ErrorInfo);
 	} 
 	else
 	{
+		$mail->ClearAddresses();
+		$mail->ClearReplyTos();
+		$mail->SmtpClose();
+		
 		return true;
 	}
 }
