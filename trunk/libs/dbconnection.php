@@ -14,8 +14,8 @@ class DbConnection {
 	private $userName;
 	private $password;
 	private $prepareStatement;
-	private $myFirePhp;
-	private $logger;
+	public $myFirePhp;
+	public $logger;
 	
 	private $arrayFields; //Only MYSQLI prepared stmts
 	
@@ -95,11 +95,21 @@ class DbConnection {
  		
  		if ($this->driver == "PGSQL") {
 
- 			$this->connection = pg_connect("host=$this->hostName port=$this->port user=$this->userName password=$this->password dbname=$this->dbName");
+ 			if ( DB_PERSISTENT == 0 ) {
+ 				$this->connection = pg_connect("host=$this->hostName port=$this->port user=$this->userName password=$this->password dbname=$this->dbName");
+ 			} else {
+ 				$this->connection = pg_pconnect("host=$this->hostName port=$this->port user=$this->userName password=$this->password dbname=$this->dbName");
+ 			}
+ 			
  			
  		} elseif ($this->driver == "MYSQL") {
  			
- 			$this->connection = new mysqli($this->hostName, $this->userName, $this->password, $this->dbName, $this->port);
+ 			if ( DB_PERSISTENT == 0 ) {
+ 				$this->connection = new mysqli($this->hostName, $this->userName, $this->password, $this->dbName, $this->port);
+ 			} else {
+ 				$this->connection = new mysqli("p:$this->hostName", $this->userName, $this->password, $this->dbName, $this->port);
+ 			}
+ 			
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -298,7 +308,12 @@ class DbConnection {
  		}
 		
 		if (!$result) {
+			$this->myFirePhp->log("KO: " . $this->getLastError());
+			$this->logger->debug("KO: " . $this->getLastError());
 			throw new Exception( $this->getLastError() );
+		} else {
+			$this->myFirePhp->log("OK");
+			$this->logger->debug("OK");
 		}
 		
 		return $result;
@@ -360,6 +375,7 @@ class DbConnection {
  		} elseif ($this->driver == "MYSQL") {
  			if ($this->prepareStatement->execute()) {
  				$this->myFirePhp->log("OK");
+ 				$this->logger->debug("OK");
  				$this->prepareStatement->store_result();
  				//$res = $this->prepareStatement->get_result();
  				//$this->prepareStatement->close();
@@ -370,14 +386,20 @@ class DbConnection {
  					$this->arrayFields = array();
  					$params = array();
  					while($field = $meta->fetch_field()) {
+ 						$keys = array_keys($this->arrayFields);
+ 						if (array_search($field->name, $keys) !== FALSE) {
+ 							$field->name = "b.$field->name";
+ 						}
  						$params[] = &$this->arrayFields[$field->name];
  					}
+ 					//$this->logger->debug(">> Columns fecthed: " . print_r($this->arrayFields, true));
  					call_user_func_array(array($this->prepareStatement, 'bind_result'), $params);
  					$this->myFirePhp->log($this->arrayFields, "Fields");
  				}
  				return $this->prepareStatement;
  			} else {
  				$this->myFirePhp->log("KO: " . $this->getLastError());
+ 				$this->logger->debug("KO: " . $this->getLastError());
  				return NULL;
  			} 
  			
