@@ -16,6 +16,7 @@ define("DB_ASC",       12);
 define("DB_DESC",      13);
 define("DB_OWN_ID",    15);
 define("DB_SAME_FIELD",16);
+define("DB_NOT_EQUAL", 17);
 
 
 /** Clase para los modelos
@@ -352,8 +353,17 @@ class DbModel {
 	}
 
 	
+	/**
+	 * Alias para doSave() 
+	 * @return boolean
+	 */
+	public function doInsert() {
+		return $this->doSave();
+	}
+	
+	
 	/** Realiza un INSERT en la BD.
-		@return bool
+		@return boolean
     */
     public function doSave() {
 		if ($this->tableName == null) {
@@ -407,7 +417,7 @@ class DbModel {
 		}
 
 		$this->clear();
-		$this->id = $this->getLastId();
+		//$this->id = $this->getLastId();
 		return true;
 	}
 
@@ -650,6 +660,9 @@ class DbModel {
 				$comp = " NOT IN (";
 				$array = true;
 				break;
+			case DB_NOT_EQUAL:
+				$comp = "<>";
+				break;
 		}
 		
 		if ($array == true) {
@@ -731,12 +744,24 @@ class DbModel {
     */
     public function next() {
 		$this->fieldsByName = $this->conn->getFetchAssoc($this->result);
+		if ($this->fieldsByName != null) {
+			$this->conn->logger->debug(">> NEXT $this->tableName: " . print_r($this->fieldsByName, true));
+		}
 		$this->seek($this->cursor);
 		$this->fieldsByPos = $this->conn->getFetchArray($this->result);
 		$this->cursor = $this->cursor + 1;
 		if (isset($this->fieldsByName[$this->idField]))
 			$this->id = $this->fieldsByName[$this->idField];
 		return $this->fieldsByName;
+	}
+	
+	
+	/** Mueve el apuntador al registro anterior del resultado de la consulta.
+	@return bool
+	*/
+	public function prev() {
+		$this->cursor = $this->cursor - 2;
+		$this->seek($this->cursor);
 	}
 
 	
@@ -819,9 +844,17 @@ class DbModel {
 	/** Retorna el id del ultimo registro existente en la tabla.
 		@return int
 	*/
-	public function getLastId() {
+	public function getLastId($where = "") {
 		try {
-			if ($this->execQuery("SELECT MAX($this->idField) FROM ".$this->tableName)) {
+			// Se especificó clausula where
+			if ($where != ""){
+				$where = " WHERE ".$where;
+			}
+			$sql = "SELECT max($this->idField) as ID FROM ".$this->tableName.$where;
+			/*if (DB_DRIVER == "MYSQL") {
+				$sql = "SELECT LAST_INSERT_ID() as ID";
+			}*/
+			if ($this->execQuery($sql)) {
 				if ($this->next()) {
 					return $this->getValueByPos(0);
 				} else {
