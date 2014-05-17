@@ -760,7 +760,7 @@ class DbModel {
 	@return bool
 	*/
 	public function prev() {
-		$this->cursor = $this->cursor - 2;
+		$this->cursor = $this->cursor - 1;
 		$this->seek($this->cursor);
 	}
 
