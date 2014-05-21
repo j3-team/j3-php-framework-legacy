@@ -673,6 +673,38 @@ class DbConnection {
 	}
 	
 	
+	/** Retorna el numero de filas afectadas por la operación (INSERT, UPDATE, DELETE).
+	 * @param result. Resultado del query.
+	 * @return int.
+	 */
+	public function getAffectedRows($result) {
+		if ($this->driver == "PGSQL") {
+	
+			return pg_affected_rows($result);
+	
+		} elseif ($this->driver == "MYSQL") {
+	
+			return $this->prepareStatement->affected_rows;
+	
+		} elseif ($this->driver == "DB2") {
+	
+			return db2_num_rows($result);
+	
+		} elseif ($this->driver == "SQLITE") {
+	
+			return sqlite_num_rows();
+	
+		} elseif ($this->driver == "ODBC") {
+	
+			return odbc_num_rows($result);
+	
+		} elseif ($this->driver == "ORACLE") {
+	
+			//return ora
+		}
+	}
+	
+	
 	/** Retorna el numero de campos en el result.
 	 * @param result. Resultado del query.
 	 * @return int.

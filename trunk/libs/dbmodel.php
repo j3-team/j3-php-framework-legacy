@@ -598,7 +598,7 @@ class DbModel {
 
     /** Ejecuta el query especificado en la BD.
         @param query String con el query a ejecutar.
-        @return Resultser
+        @return Resultset
     */
     public function execQuery($query) {
 		try {
@@ -784,6 +784,13 @@ class DbModel {
 	*/
 	public function rows() {
 		return $this->conn->getNumRows( $this->result );
+	}
+	
+	/** Retorna el numero de filas afectadas por la operación (INSERT, UPDATE, DELETE).
+	@return int
+	*/
+	public function affectedRows() {
+		return $this->conn->getAffectedRows( $this->result );
 	}
 	
 	/** Mueve el apuntador al comienzo.
