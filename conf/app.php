@@ -56,7 +56,7 @@ define ("APP_TITLE", "J3 PHP Framework");
 # Section [PERMISSIONS]
 # Seccion donde se establece el comportamiento del sistema en caso de que el usuario no tenga
 # acceso a una funcionalidad. 
-# [Variables]
+# [Variables] (Funciona igual para DENIED y EXPIRED)
 #   DENIED_ACTION : Accion a ejecutar por el sistema.
 #                   [Posibles valores]
 #                      1 : Notificacion
@@ -67,7 +67,11 @@ define ("APP_TITLE", "J3 PHP Framework");
 
 define ("DENIED_ACTION", 1);
 define ("DENIED_MSG", "No permitido!");
-define ("DENIED_PAGE", "home");
+define ("DENIED_PAGE", "home/");
+
+define ("EXPIRED_ACTION", 2);
+define ("EXPIRED_MSG", "Sesión expirada!");
+define ("EXPIRED_PAGE", "home/");
 
 	
 #----------------------------------------------------------------------

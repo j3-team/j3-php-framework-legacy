@@ -104,7 +104,7 @@ class DbModel {
 	
 	private function getOperator($i, $k, $o, $p) {
 		if (strcmp($o, "##") != 0) {
-			$cond = (is_null($p) ? "" : "$p.") . $k . $o;
+			$cond = (is_null($p) || strpos($k, ".") > 0 ? "" : "$p.") . $k . $o;
 			if ($i > 0) {
 				if ($this->endIN == true) {
 					$this->endIN = false;
@@ -422,7 +422,7 @@ class DbModel {
 	}
 
 
-    /** Realiza un UPDATE en la BD.
+    /** Realiza un UPDATE en la BD (Por ID).
         @return bool
     */
     public function doUpdate() {
@@ -461,12 +461,70 @@ class DbModel {
 		}
 
 		$this->result = $this->conn->preparar("UPDATE $this->tableName SET $campos WHERE $this->idField=$this->id");
+		
 		if (is_null($this->result)) {
 			return false;
 		}
 		
 		try {
 			$this->result = $this->conn->ejecutar($this->fieldsByName);
+			if (is_null($this->result)) {
+				return false;
+			}
+		} catch (Exception $e) {
+			throw $e;
+			return false;
+		}
+	
+		$this->clear();
+		return true;
+	}
+	
+	
+	/** Realiza un UPDATE en la BD de todos los registros que cumplan las condiciones.
+	@return bool
+	*/
+	public function doUpdateAll() {
+		if ($this->tableName == null) {
+			throw new Exception ("Tabla no especificada");
+			return false;
+		}
+	
+		$campos = "";
+		$valores = "";
+		$keys = array_keys($this->fieldsByName);
+		for ($i=0; $i<count($keys); $i=$i+1) {
+			$val = $this->fieldsByName[ $keys[$i] ];
+			if ($i > 0) {
+				if ($val[0] == "%") { //is a db function
+					$campos = $campos . ", " . $keys[$i] . "=" . substr($val, 1);
+					unset($this->fieldsByName[ $keys[$i] ]);
+					array_splice($keys, $i, 1);
+					$i = $i-1;
+				} else {
+					$campos = $campos . ", " . $keys[$i] . "=" . $this->conn->getPreparedStatementVar($i+1);
+				}
+			} else {
+				if ($val[0] == "%") { //is a db function
+					$campos = $keys[$i] . "=" . substr($val, 1);
+					unset($this->fieldsByName[ $keys[$i] ]);
+					array_splice($keys, $i, 1);
+					$i = $i-1;
+				} else {
+					$campos = $keys[$i] . "=" . $this->conn->getPreparedStatementVar($i+1);
+				}
+			}
+		}
+	
+		$condiciones = $this->getConditions();
+		$this->result = $this->conn->preparar("UPDATE $this->tableName SET $campos WHERE $condiciones");
+		
+		if (is_null($this->result)) {
+			return false;
+		}
+	
+		try {
+			$this->result = $this->conn->ejecutar(array_merge($this->fieldsByName, $this->conditionFields));
 			if (is_null($this->result)) {
 				return false;
 			}
@@ -515,11 +573,9 @@ class DbModel {
 		
 		$condiciones = $this->getConditions();
 		
-		$orders = $this->getOrders();
-		
 		if ($condiciones == null) {
 			try {
-				$this->result = $this->conn->ejecutarSQL("xxxxxDELETE FROM $this->tableName $orders");
+				$this->result = $this->conn->ejecutarSQL("DELETE FROM $this->tableName");
 			} catch (Exception $e) {
 				throw $e;
 				return false;
@@ -527,7 +583,7 @@ class DbModel {
 		} else {
 		
 			try {
-				$this->conn->preparar("DELETE FROM $this->tableName WHERE $condiciones $orders");
+				$this->conn->preparar("DELETE FROM $this->tableName WHERE $condiciones");
 				$this->result = $this->conn->ejecutar($this->conditionFields);
 			} catch (Exception $e) {
 				throw $e;
@@ -667,7 +723,11 @@ class DbModel {
 		
 		if ($array == true) {
 			$i = 0;
-			$arr = explode( ",", $value );
+			if (is_array($value)) {
+				$arr = $value;
+			} else {
+				$arr = explode( ",", $value );
+			}
 			foreach ($arr as $val) {
 				if ($i > 0) {
 					$this->conditionFields[$field . $i] = $val;
@@ -676,6 +736,7 @@ class DbModel {
 					$this->conditionFields[$field] = $val;
 					array_push($this->conditionOperators, $comp);
 				}
+				$i = $i + 1;
 			}
 		} else {
 			$this->conditionFields[$field] = $value;
@@ -947,11 +1008,9 @@ class DbModel {
 	
 		$condiciones = $this->getConditions();
 	
-		$orders = $this->getOrders();
-	
 		if ($condiciones == null) {
 			try {
-				$this->result = $this->conn->ejecutarSQL("SELECT COUNT(*) as count FROM $this->tableName $orders");
+				$this->result = $this->conn->ejecutarSQL("SELECT COUNT(*) as count FROM $this->tableName");
 			} catch (Exception $e) {
 				throw $e;
 				return false;
@@ -959,7 +1018,7 @@ class DbModel {
 		} else {
 	
 			try {
-				$this->conn->preparar("SELECT COUNT(*) as count FROM $this->tableName WHERE $condiciones $orders");
+				$this->conn->preparar("SELECT COUNT(*) as count FROM $this->tableName WHERE $condiciones");
 				$this->result = $this->conn->ejecutar(array_values($this->conditionFields));
 			} catch (Exception $e) {
 				throw $e;
