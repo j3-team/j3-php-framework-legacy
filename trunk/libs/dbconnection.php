@@ -216,6 +216,7 @@ class DbConnection {
  		} elseif ($this->driver == "MYSQL") {
  			
  			$result = $this->connection->commit();
+ 			$this->connection->autocommit(TRUE);
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -247,6 +248,7 @@ class DbConnection {
  		} elseif ($this->driver == "MYSQL") {
  			
 			$result = $this->connection->rollback();
+			$this->connection->autocommit(TRUE);
  			
  		} elseif ($this->driver == "DB2") {
  			
@@ -373,6 +375,7 @@ class DbConnection {
  			return pg_execute($this->connection, $this->prepareStatement, $values);
  			
  		} elseif ($this->driver == "MYSQL") {
+ 			$this->myFirePhp->log("ejecutando");
  			if ($this->prepareStatement->execute()) {
  				$this->myFirePhp->log("OK");
  				$this->logger->debug("OK");
@@ -821,7 +824,7 @@ class DbConnection {
 					$keys = array_keys($values); 
 					$key = $keys[$i];
 					$value = $values[$key];
-					
+				
 					$is_id = ($key == "id") || (strpos($key, "_id")!== false) || (strpos($key, "id_")!== false);
 					if ($is_id || is_int($value) || is_long($value)) {
 						$t = "i";
@@ -843,6 +846,7 @@ class DbConnection {
 				if (!call_user_func_array(array($this->prepareStatement, 'bind_param'), $nuevo)) {
 					$this->myFirePhp->log("ERROR EN BIND");
 				}
+				
 				//$this->prepareStatement->bind_param("s", $value);
 			}
 	

@@ -79,6 +79,7 @@ class Controller {
 		$this->continuar = true;
 		
 		session_start();
+		setcookie(session_name(),session_id(),time()+SESSION_TIME);
 		
 		if ($vista) {
 			if (method_exists($this, $vista) == true) {
@@ -268,7 +269,11 @@ class Controller {
 	/** Funcion que se ejecuta cuando la sesión ha expirado (En caso de MANUAL)
 	*/
 	public function sessionExpired() {
-		echo "Sesion expirada";
+		if (EXPIRED_ACTION == 1) {
+			echo EXPIRED_MSG;
+		} else {
+			$this->redirect(EXPIRED_PAGE);
+		}
 	}
 	
 

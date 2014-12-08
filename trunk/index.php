@@ -72,25 +72,17 @@ if (isset($_GET["tres"])) {
 
 /** Verifica si se especifico un controlador.
  */
-if (isset($_GET["controlador"])) 
-{
+if (isset($_GET["controlador"])) {
 	$c = $_GET["controlador"];
-	if (strcmp($c, "phpinfo") == 0) 
-	{
+	if (strcmp($c, "phpinfo") == 0) {
 		echo phpinfo();
 		//print_r( get_loaded_extensions() );
-	} 
-	elseif (strcmp($c, "") != 0) 
-	{
+	} elseif (strcmp($c, "") != 0) {
 			continue_load($c);
-	} 
-	else 
-	{
+	} else {
 		wellcome_page();
 	}
-}
-else
-{
+} else {
 	wellcome_page();
 }
 
