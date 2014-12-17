@@ -231,8 +231,10 @@ class DbModel {
 			
 		if (DB_ID == 2) {
 			$fieldName = "id_$fieldName";
-		} else {
+		} else if (DB_ID == 3) {
 			$fieldName = $fieldName . "_id";
+		} else {
+			$fieldName = "id";
 		}
 		
 		return $fieldName;
