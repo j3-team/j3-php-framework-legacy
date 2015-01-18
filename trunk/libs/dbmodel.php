@@ -378,6 +378,10 @@ class DbModel {
 		$keys = array_keys($this->fieldsByName);
 		for ($i=0; $i<count($keys); $i=$i+1) {
 			$val = $this->fieldsByName[ $keys[$i] ];
+			
+			//insert into conditions for post queries
+			$this->addCondition($keys[$i], $val);
+			
 			if ($i > 0) {
 				$campos = $campos . ", " . $keys[$i];
 				if ($val[0] == "%") { //is a db function
@@ -418,8 +422,10 @@ class DbModel {
 			return false;
 		}
 
-		$this->clear();
-		//$this->id = $this->getLastId();
+		//$savedId = $this->getLastId();
+		//$this->clear();
+		//$this->id = $savedId;
+		
 		return true;
 	}
 
@@ -939,6 +945,19 @@ class DbModel {
 	}
 	
 	
+	/**
+	 * Retorna el ID del registro almacenado en la tabla recientemente
+	 * @return string|number
+	 */
+	public function getLastSavedId() {
+		if ($this->doSelectMax($this->idField)) {
+			return $this->getValue("max");
+		} else {
+			return -1;
+		}
+	}
+	
+	
 	/** Lee un archivo y retorna el contenido de manera que pueda ser guardado como un dato tipo blob.
 		@param path Ruta del archivo.
 		@return data del archivo o null en caso de error
@@ -1030,6 +1049,43 @@ class DbModel {
 	
 		$this->clear();
 		
+		return $this->next();
+	}
+	
+	
+	/**
+	 * Realiza un SELECT MAX en la BD.
+	 *  @param $fieldName
+	 * @return bool.
+	 */
+	public function doSelectMax($fieldName) {
+		if ($this->tableName == null) {
+			throw new Exception ("Tabla no especificada");
+			return false;
+		}
+	
+		$condiciones = $this->getConditions();
+	
+		if ($condiciones == null) {
+			try {
+				$this->result = $this->conn->ejecutarSQL("SELECT MAX($fieldName) as max FROM $this->tableName");
+			} catch (Exception $e) {
+				throw $e;
+				return false;
+			}
+		} else {
+	
+			try {
+				$this->conn->preparar("SELECT MAX($fieldName) as max FROM $this->tableName WHERE $condiciones");
+				$this->result = $this->conn->ejecutar(array_values($this->conditionFields));
+			} catch (Exception $e) {
+				throw $e;
+				return false;
+			}
+		}
+	
+		$this->clear();
+	
 		return $this->next();
 	}
 }
