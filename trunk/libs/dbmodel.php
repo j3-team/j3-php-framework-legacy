@@ -781,6 +781,13 @@ class DbModel {
 		$this->fieldsByName[$field] = $value;
 	}
 
+	/** Asigna el valor BLOB dado al campo establecido. Se usa antes de un updateIt y SaveIt.
+	@param field Campo a asignar el valor.
+	@param value Valor a asignar.
+	*/
+	public function setBlobValue($field, $value) {
+		$this->fieldsByName[$field] = "{$value}";
+	}
 
     /** Retorna el valor del campo especificado.
         @param field Campo a retornar su valor.
@@ -972,10 +979,18 @@ class DbModel {
 		@param data Contenido binario.
 		@return int.
 	*/
-	public function unescapeBlob($path, $data) {
-		return $this->conn->unescapeBlob($path, $data);
+	public function unescapeBlob2File($path, $data) {
+		return $this->conn->unescapeBlobToFile($path, $data);
 	}
 
+	/** Toma el valor de un dato tipo BLOB y retorna el contenido.
+	@param data Contenido binario.
+	@return content.
+	*/
+	public function unescapeBlob($data) {
+		return $this->conn->unescapeBlob($data);
+	}
+	
 
 	/** Actualiza un registro agregando el dato blob
 		@param field Campo de la tabla.
