@@ -495,11 +495,19 @@ class DbConnection {
 
 	
 	/** Toma el valor de un dato tipo BLOB y lo guarda en un archivo.
-		@param path Ruta del archivo.
-		@param data Contenido binario.
-		@return int.
+	@param path Ruta del archivo.
+	@param data Contenido binario.
+	@return int.
 	*/
-	public function unescapeBlob($path, $data) {
+	public function unescapeBlobToFile($path, $data) {
+		return file_put_contents($path, $this->unescapeBlob($path, $data));
+	}
+	
+	/** Toma el valor de un dato tipo BLOB y retorna su contenido.
+		@param data Contenido binario.
+		@return content.
+	*/
+	public function unescapeBlob($data) {
 		$content = null;
 		if ($this->driver == "PGSQL") {
  			
@@ -526,7 +534,7 @@ class DbConnection {
  			//return ora_error();
  		}
 		
-		return file_put_contents($path, $content);
+		return $content;
 	}
 	
 
