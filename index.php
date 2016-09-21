@@ -1,5 +1,4 @@
 <?php
-
 ###################################
 # Archivo principal. Se ejecuta en todas las peticiones y dependiendo de los parametros, 
 # redirije al controlador necesario.  
@@ -54,7 +53,6 @@ function continue_load($c) {
 
 }
 
-
 /** Verifica si la redireccion agrego un parametro mas al final de la URL.
  */
 if (isset($_GET["tres"])) {
@@ -68,7 +66,6 @@ if (isset($_GET["tres"])) {
 		header("location:".APP_URL."$m/$t");
 	exit(0);
 }
-
 
 /** Verifica si se especifico un controlador.
  */
