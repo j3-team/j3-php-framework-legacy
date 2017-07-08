@@ -19,7 +19,7 @@ $array = explode('/', $_SERVER["REQUEST_URI"],3);
 #                1 : (FOLDER) Normalmente en entornos de desarrollo.
 #                    Ubicado en una carpeta dentro del sitio del apache.
 #                2 : (ROOT) Ubicado en la raiz del servidor.
-#                    Normalmente para entornos de producción.
+#                    Normalmente para entornos de producciï¿½n.
 #----------------------------------------------------------------------
 define ("FS_TYPE", 1);
 
@@ -35,8 +35,18 @@ define ("FS_TYPE", 1);
 #   APP_BASE : Define el path base de la aplicacion
 #----------------------------------------------------------------------
 
+if (isset($_SERVER['HTTPS']) &&
+    ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) ||
+    isset($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
+    $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+       define("APP_PROTOCOL", "https");
+}
+else {
+   define("APP_PROTOCOL", "http");
+}
+
 define ("APP_PATH", $_SERVER['HTTP_HOST'].(FS_TYPE == 1 ? ('/'.$array[1]) : ''));
-define ("APP_URL",  'http://'.APP_PATH.'/');
+define ("APP_URL",  APP_PROTOCOL.'://'.APP_PATH.'/');
 define ("APP_BASE", '<base href="'. APP_URL .'" />');
 
 
@@ -55,7 +65,7 @@ define ("APP_TITLE", "J3 PHP Framework");
 #----------------------------------------------------------------------
 # Section [PERMISSIONS]
 # Seccion donde se establece el comportamiento del sistema en caso de que el usuario no tenga
-# acceso a una funcionalidad. 
+# acceso a una funcionalidad.
 # [Variables] (Funciona igual para DENIED y EXPIRED)
 #   DENIED_ACTION : Accion a ejecutar por el sistema.
 #                   [Posibles valores]
@@ -70,10 +80,10 @@ define ("DENIED_MSG", "No permitido!");
 define ("DENIED_PAGE", "home/");
 
 define ("EXPIRED_ACTION", 2);
-define ("EXPIRED_MSG", "Sesión expirada!");
+define ("EXPIRED_MSG", "Sesiï¿½n expirada!");
 define ("EXPIRED_PAGE", "home/");
 
-	
+
 #----------------------------------------------------------------------
 # Section [SESIONES]
 # Para controlar las sesiones
@@ -86,7 +96,7 @@ define ("EXPIRED_PAGE", "home/");
 #----------------------------------------------------------------------
 
 define ("SESSION_TIME", 3000); // 300 Segundos = 5 min
-define ("SESSION_EXPIRE_TYPE", 1); 
+define ("SESSION_EXPIRE_TYPE", 1);
 
 
 #----------------------------------------------------------------------
